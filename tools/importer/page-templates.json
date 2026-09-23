@@ -22,7 +22,100 @@
       ],
       "coverageGaps": [],
       "description": "General content page: full-width hero banner followed by stacked content sections (image+text, icon feature grid, CTA blocks, testimonials)",
-      "blocks": []
+      "blocks": [
+        {
+          "name": "hero-minimal-dark",
+          "instances": [
+            ".hero.teaser"
+          ]
+        },
+        {
+          "name": "columns-comfortable-light",
+          "instances": [
+            ".mediainfo"
+          ]
+        },
+        {
+          "name": "cards",
+          "instances": [
+            ".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(3)"
+          ]
+        },
+        {
+          "name": "columns-minimal-light",
+          "instances": [
+            ".columncontainer.spacing__top--40px"
+          ]
+        },
+        {
+          "name": "quote",
+          "instances": [
+            ".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "s1",
+          "name": "hero",
+          "selector": [
+            ".hero.teaser"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-minimal-dark"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "s2",
+          "name": "who-we-are-intro",
+          "selector": [
+            ".mediainfo"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-comfortable-light"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "s3",
+          "name": "feature-grid",
+          "selector": [
+            ".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(3)"
+          ],
+          "style": "grey",
+          "blocks": [
+            "cards"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "s4",
+          "name": "sell-your-business-cta",
+          "selector": [
+            ".columncontainer.spacing__top--40px"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-minimal-light"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "s5",
+          "name": "testimonials",
+          "selector": [
+            ".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)"
+          ],
+          "style": "grey",
+          "blocks": [
+            "quote"
+          ],
+          "defaultContent": []
+        }
+      ]
     },
     {
       "name": "section-landing",
@@ -90,5 +183,8 @@
       "description": "Locator page: two-column layout with heading, search input and toggle on the left and an interactive map on the right",
       "blocks": []
     }
-  ]
+  ],
+  "metadata": {
+    "projectType": "xwalk"
+  }
 }

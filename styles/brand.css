@@ -1,0 +1,19 @@
+:root {
+  --heading-font-family: 'Work Sans', arial, sans-serif;
+  --body-font-family: 'Work Sans', arial, sans-serif;
+  --background-color: #fff;
+  --text-color: rgb(54 54 54);
+  --link-color: rgb(232 119 34);
+  --link-hover-color: rgb(0 86 179);
+  --section-padding: 40px;
+  --nav-height: 64px;
+  --brand-orange: rgb(232 119 34);
+  --brand-navy: rgb(30 58 95);
+  --brand-grey: rgb(240 239 235);
+  --heading-size-xxl: 48px;
+  --heading-size-xl: 32px;
+  --heading-size-l: 24px;
+  --heading-size-m: 20px;
+  --heading-size-s: 18px;
+  --heading-size-xs: 16px;
+}

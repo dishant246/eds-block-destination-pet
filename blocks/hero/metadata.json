@@ -1,0 +1,33 @@
+{
+  "id": "hero",
+  "name": "hero",
+  "variantName": "hero",
+  "baseBlock": "hero",
+  "type": "hero",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "minimal",
+    "hasBackgroundImage": true,
+    "hasGrid": false,
+    "imagePattern": "full-bleed",
+    "structure": "background image + overlaid heading"
+  },
+  "contentPattern": "Hero banner with background image and overlaid heading",
+  "options": [],
+  "memberVariantIds": [
+    "v_7118eab925d3"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/"
+    ],
+    "reuseCount": 1
+  }
+}

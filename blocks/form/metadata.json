@@ -1,0 +1,33 @@
+{
+  "id": "form",
+  "name": "form",
+  "variantName": "form",
+  "baseBlock": "form",
+  "type": "form",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "minimal",
+    "hasBackgroundImage": false,
+    "hasGrid": false,
+    "imagePattern": "noimg",
+    "structure": "form fields + submit"
+  },
+  "contentPattern": "Interactive form with fields and submit",
+  "options": [],
+  "memberVariantIds": [
+    "v_dc8efe61c2e6"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/"
+    ],
+    "reuseCount": 1
+  }
+}

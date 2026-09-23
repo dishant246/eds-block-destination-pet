@@ -1,30 +1,15 @@
 {
   "definitions": [
     {
-      "title": "Cards",
-      "id": "cards",
+      "title": "Hero Minimal Dark",
+      "id": "hero-minimal-dark",
       "plugins": {
         "xwalk": {
           "page": {
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
-              "name": "Cards",
-              "filter": "cards"
-            }
-          }
-        }
-      }
-    },
-    {
-      "title": "Card",
-      "id": "card",
-      "plugins": {
-        "xwalk": {
-          "page": {
-            "resourceType": "core/franklin/components/block/v1/block/item",
-            "template": {
-              "name": "Card",
-              "model": "card"
+              "name": "Hero Minimal Dark",
+              "model": "hero-minimal-dark"
             }
           }
         }
@@ -33,7 +18,7 @@
   ],
   "models": [
     {
-      "id": "card",
+      "id": "hero-minimal-dark",
       "fields": [
         {
           "component": "richtext",
@@ -46,7 +31,8 @@
           "component": "text",
           "valueType": "string",
           "name": "imageAlt",
-          "label": "Alt"
+          "label": "Alt",
+          "value": ""
         },
         {
           "component": "richtext",
@@ -58,12 +44,5 @@
       ]
     }
   ],
-  "filters": [
-    {
-      "id": "cards",
-      "components": [
-        "card"
-      ]
-    }
-  ]
+  "filters": []
 }

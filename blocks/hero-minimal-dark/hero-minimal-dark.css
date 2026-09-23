@@ -1,0 +1,77 @@
+/* Block: hero-minimal-dark
+ * Source: destinationpet.com .hero.teaser
+ * Full-bleed background photo (object-fit: cover) with a single white heading
+ * centered over it. No overlay, no text-shadow on the source.
+ * Values extracted from source computed styles.
+ */
+
+/* Full-width: cancel the section max-width/padding so the hero bleeds edge to edge */
+.hero-minimal-dark-container .hero-minimal-dark-wrapper {
+  max-width: unset;
+  padding: 0;
+}
+
+.hero-minimal-dark {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* source .hero__wrapper: align/justify center */
+  align-items: center;
+  min-height: 360px;
+  padding: 40px 24px;        /* source horizontal padding 24px */
+  overflow: hidden;
+}
+
+/* Background media layer (source .hero__image: absolute, inset 0) */
+.hero-minimal-dark .hero-minimal-dark-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-minimal-dark picture {
+  position: absolute;
+  inset: 0;
+}
+
+/* Image: object-fit cover, fills the layer (source: no filter, no overlay) */
+.hero-minimal-dark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content sits above the image */
+.hero-minimal-dark .hero-minimal-dark-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+}
+
+/* Heading -- exact source values: 48px, weight 400 (NOT global 700),
+   line-height 52.8px, white, centered, margin 0 0 5px */
+.hero-minimal-dark h1 {
+  margin: 0 0 5px;
+  color: var(--background-color);
+  font-family: var(--heading-font-family);
+  font-size: 32px;            /* mobile scale-down; desktop = 48px below */
+  font-weight: 400;
+  line-height: 1.1;           /* 52.8 / 48 */
+  letter-spacing: normal;
+  text-align: center;
+}
+
+@media (width >= 900px) {
+  .hero-minimal-dark {
+    /* Source block is 1280 x 643 (~2:1) at desktop; border-box min-height
+       reproduces that height while flex keeps the heading centered. */
+    min-height: 643px;
+    padding: 48px 24px;
+  }
+
+  .hero-minimal-dark h1 {
+    font-size: 48px;
+  }
+}

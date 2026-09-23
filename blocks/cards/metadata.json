@@ -1,0 +1,35 @@
+{
+  "id": "cards",
+  "name": "cards",
+  "variantName": "cards",
+  "baseBlock": "cards",
+  "type": "cards",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "comfortable",
+    "hasBackgroundImage": false,
+    "hasGrid": true,
+    "imagePattern": "icon-grid",
+    "structure": "grid of icon + heading + text cards"
+  },
+  "contentPattern": "Grid of repeating cards, each with image/icon and text",
+  "options": [],
+  "memberVariantIds": [
+    "v_6cd7800517e5"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/",
+      "/index"
+    ],
+    "reuseCount": 2,
+    "lastUsed": "2026-09-23T16:35:25.496Z"
+  }
+}

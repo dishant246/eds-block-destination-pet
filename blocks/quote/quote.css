@@ -1,41 +1,64 @@
+/* Quote block — Testimonials variant (source: destinationpet.com) */
+
 .quote blockquote {
+  position: relative;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
-  max-width: 900px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* decorative quotation marks (source: olive-brown corner marks) */
+.quote blockquote::before,
+.quote blockquote::after {
+  position: absolute;
+  left: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1;
+  color: rgb(90 71 27);
+}
+
+.quote blockquote::before {
+  content: '\201C';
+  top: 24px;
+}
+
+.quote blockquote::after {
+  content: '\201D';
+  bottom: -4px;
+}
+
+/* quotation body */
+.quote blockquote .quote-quotation {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.16px;
+  color: var(--text-color);
+}
+
+.quote blockquote .quote-quotation p {
+  margin: 0 0 10px;
+}
+
+/* attribution (source: centered, literal "- " dash already in content, bold name) */
+.quote blockquote .quote-attribution {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.16px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.quote blockquote .quote-attribution strong {
+  font-weight: 700;
 }
 
 @media (width >= 900px) {
   .quote blockquote {
-    padding: 0 32px;
+    padding: 48px 32px;
   }
-}
-
-.quote blockquote .quote-quotation {
-  font-size: 120%;
-}
-
-.quote blockquote .quote-quotation > :first-child {
-  text-indent: -0.5ch;
-}
-
-.quote blockquote .quote-quotation p:first-child::before,
-.quote blockquote .quote-quotation p:last-child::after {
-  line-height: 0;
-}
-
-.quote blockquote .quote-quotation p:first-child::before {
-  content: '“';
-}
-
-.quote blockquote .quote-quotation p:last-child::after {
-  content: '”';
-}
-
-.quote blockquote .quote-attribution {
-  text-align: right;
-}
-
-.quote blockquote .quote-attribution p:first-child::before {
-  content: '—';
-  padding-right: 0.5ch;
 }

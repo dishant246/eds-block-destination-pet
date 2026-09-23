@@ -1,0 +1,33 @@
+{
+  "id": "footer",
+  "name": "footer",
+  "variantName": "footer",
+  "baseBlock": "footer",
+  "type": "footer",
+  "canonicalModel": "configuration",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "comfortable",
+    "hasBackgroundImage": false,
+    "hasGrid": true,
+    "imagePattern": "logo",
+    "structure": "logo + link columns + contact + copyright"
+  },
+  "contentPattern": "Site footer: logo, grouped link columns, contact info and copyright",
+  "options": [],
+  "memberVariantIds": [
+    "footer-global"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/"
+    ],
+    "reuseCount": 1
+  }
+}

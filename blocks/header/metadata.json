@@ -1,0 +1,33 @@
+{
+  "id": "header",
+  "name": "header",
+  "variantName": "header",
+  "baseBlock": "header",
+  "type": "header",
+  "canonicalModel": "configuration",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "minimal",
+    "hasBackgroundImage": false,
+    "hasGrid": false,
+    "imagePattern": "logo",
+    "structure": "logo + primary nav"
+  },
+  "contentPattern": "Site header: logo and primary navigation",
+  "options": [],
+  "memberVariantIds": [
+    "header-global"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/"
+    ],
+    "reuseCount": 1
+  }
+}

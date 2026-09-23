@@ -1,3 +1,5 @@
+@import url('brand.css');
+
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -11,34 +13,25 @@
  */
 
 :root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
-  --overlay-background-color:lightgrey;
-
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* colors (brand values sourced from brand.css) */
+  --light-color: var(--brand-grey);
+  --dark-color: var(--brand-navy);
+  --overlay-background-color: lightgrey;
 
   /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
+  --body-font-size-m: 18px;
+  --body-font-size-s: 16px;
+  --body-font-size-xs: 14px;
 
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
+  /* heading sizes (mobile) */
+  --heading-font-size-xxl: 36px;
+  --heading-font-size-xl: 28px;
+  --heading-font-size-l: 24px;
+  --heading-font-size-m: 20px;
+  --heading-font-size-s: 18px;
+  --heading-font-size-xs: 16px;
 
   /* nav heights */
-  --nav-height: 64px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
 }
@@ -63,13 +56,13 @@
     --body-font-size-s: 16px;
     --body-font-size-xs: 14px;
 
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
+    /* heading sizes (desktop, from source) */
+    --heading-font-size-xxl: 48px;
+    --heading-font-size-xl: 32px;
+    --heading-font-size-l: 24px;
+    --heading-font-size-m: 20px;
+    --heading-font-size-s: 18px;
+    --heading-font-size-xs: 16px;
   }
 }
 
@@ -116,8 +109,9 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.25;
+  color: var(--brand-navy);
   scroll-margin: 40px;
 }
 
@@ -174,7 +168,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* buttons */
+/* buttons (source: filled orange pill buttons) */
 a.button:any-link,
 button {
   box-sizing: border-box;
@@ -182,15 +176,15 @@ button {
   max-width: 100%;
   margin: 12px 0;
   border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
+  border-radius: 4px;
+  padding: 0.65em 1.6em;
   font-family: var(--body-font-family);
   font-style: normal;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
-  background-color: var(--link-color);
+  background-color: var(--brand-orange);
   color: var(--background-color);
   cursor: pointer;
   overflow: hidden;
@@ -202,7 +196,9 @@ a.button:hover,
 a.button:focus,
 button:hover,
 button:focus {
-  background-color: var(--link-hover-color);
+  background-color: var(--brand-navy);
+  color: var(--background-color);
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -215,8 +211,14 @@ button:disabled:hover {
 a.button.secondary,
 button.secondary {
   background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color);
+  border: 2px solid var(--brand-orange);
+  color: var(--brand-orange);
+}
+
+a.button.secondary:hover,
+button.secondary:hover {
+  background-color: var(--brand-orange);
+  color: var(--background-color);
 }
 
 main img {
@@ -242,7 +244,7 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: auto;
   padding: 0 24px;
 }
@@ -263,4 +265,49 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+/* grey section variant (source: tertiary background sections) */
+main .section.grey {
+  background-color: var(--brand-grey);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.dark {
+  background-color: var(--brand-navy);
+  color: #fff;
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.dark h1,
+main .section.dark h2,
+main .section.dark h3,
+main .section.dark h4,
+main .section.dark h5,
+main .section.dark h6 {
+  color: #fff;
+}
+
+/* Section-lead headings (default content above a block, e.g. "We work together
+   to be...", "Testimonials") and the trailing CTA ("More about us") are centered
+   in the source. Center default-content headings and buttons within grey
+   sections to match. */
+main .section.grey > .default-content-wrapper h1,
+main .section.grey > .default-content-wrapper h2,
+main .section.grey > .default-content-wrapper h3,
+main .section.grey > .default-content-wrapper .button-container {
+  text-align: center;
+}
+
+/* The source's section titles are a lighter weight (400) than the global bold
+   heading, and use the exact tertiary-section navy. Match both, and remove the
+   default heading top margin so the title sits centered without an extra gap. */
+main .section.grey > .default-content-wrapper h1,
+main .section.grey > .default-content-wrapper h2,
+main .section.grey > .default-content-wrapper h3 {
+  margin-top: 0;
+  color: rgb(33 55 120);
+  font-weight: 400;
 }

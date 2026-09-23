@@ -1,0 +1,35 @@
+{
+  "id": "hero-minimal-dark",
+  "name": "hero-minimal-dark",
+  "variantName": "hero-minimal-dark",
+  "baseBlock": "hero",
+  "type": "hero",
+  "canonicalModel": "standalone",
+  "version": "1.0.0",
+  "created": "2026-09-23T16:00:00.000Z",
+  "sourceContext": {
+    "originUrl": "https://www.destinationpet.com/",
+    "discoveredDuring": "site-migration"
+  },
+  "visualCharacteristics": {
+    "colorScheme": "dark",
+    "density": "minimal",
+    "hasBackgroundImage": true,
+    "hasGrid": false,
+    "imagePattern": "full-bleed",
+    "structure": "background image + overlaid heading"
+  },
+  "contentPattern": "Full-bleed background image with a single heading overlaid, no CTA",
+  "options": [],
+  "memberVariantIds": [
+    "v_f57aeaf48872"
+  ],
+  "usage": {
+    "pagesUsing": [
+      "https://www.destinationpet.com/",
+      "/index"
+    ],
+    "reuseCount": 2,
+    "lastUsed": "2026-09-23T16:35:25.496Z"
+  }
+}

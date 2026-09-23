@@ -1,27 +1,73 @@
+/* cards block -- Destination Pet "We work together to be..." icon grid
+   Values extracted from source computed styles. Keep scoped to .cards. */
+
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
-  gap: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
+/* mobile-first: single column; desktop overrides to 3 across below */
 .cards > ul > li {
-  border: 1px solid #dadada;
-  background-color: var(--background-color);
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  max-width: 480px;
+  border: 0;
+  background-color: transparent;
+  padding: 12px;
+  text-align: center;
 }
 
-.cards .cards-card-body {
-  margin: 16px;
-}
-
+/* icon image: source box ~16:9 (378.64 x 213.125), transparent badge centered */
 .cards .cards-card-image {
   line-height: 0;
 }
 
-.cards > ul > li img {
+.cards .cards-card-image img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: 0;
+}
+
+.cards .cards-card-body {
+  margin: 0;
+}
+
+.cards .cards-card-body h2 {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgb(33 55 120);
+  margin: 0 0 5px;
+  text-align: center;
+}
+
+.cards .cards-card-body h3 {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: rgb(33 55 120);
+  margin: 0 0 5px;
+  text-align: center;
+}
+
+.cards .cards-card-body p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-color);
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+/* desktop: 3 across (source cards ~402px wide within 1208px row) */
+@media (width >= 900px) {
+  .cards > ul > li {
+    flex: 0 0 33.333%;
+    max-width: none;
+  }
 }

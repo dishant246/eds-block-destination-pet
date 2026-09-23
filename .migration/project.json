@@ -7,10 +7,12 @@
       "aemSitePath": "/content/eds-block-destination-pet",
       "aemAssetsFolderPath": "/content/dam/eds-block-destination-pet",
       "aemSiteName": "eds-block-destination-pet",
-      "aemSiteTitle": "eds-block-destination-pet"
+      "aemSiteTitle": "eds-block-destination-pet",
+      "libraryUrl": "https://main--sta-xwalk-boilerplate--aemysites.aem.page/tools/sidekick/library.json"
     }
   },
   "features": [
     "site-planning"
-  ]
+  ],
+  "type": "xwalk"
 }

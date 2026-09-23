@@ -1,0 +1,53 @@
+/* columns-minimal-light — centered logo + paragraph + CTA on white
+ * Source: destinationpet.com "Sell your business" section.
+ * Content lives in a narrow, centered column, all center-aligned. */
+
+.columns-minimal-light {
+  padding-top: 40px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+/* single content cell — constrain and center */
+.columns-minimal-light > div {
+  display: flex;
+  justify-content: center;
+}
+
+.columns-minimal-light > div > div {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* handshake logo illustration */
+.columns-minimal-light picture {
+  display: inline-block;
+}
+
+.columns-minimal-light img {
+  width: 282px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* body copy */
+.columns-minimal-light p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 22.4px;
+  color: var(--text-color);
+}
+
+/* orange pill CTA (source: 700 weight, 19px/24px padding) */
+.columns-minimal-light .button-container {
+  margin: 12px 0 0;
+}
+
+main .columns-minimal-light a.button:any-link {
+  padding: 19px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: var(--brand-orange);
+  color: #fff;
+}
