@@ -33,6 +33,22 @@
           "value": "",
           "label": "Attribution",
           "valueType": "string"
+        },
+        {
+          "component": "select",
+          "name": "classes",
+          "value": "",
+          "label": "Alignment",
+          "options": [
+            {
+              "name": "Centered (default)",
+              "value": ""
+            },
+            {
+              "name": "Left aligned",
+              "value": "left"
+            }
+          ]
         }
       ]
     }

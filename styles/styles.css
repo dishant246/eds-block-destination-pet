@@ -274,6 +274,24 @@ main .section.grey {
   padding: 40px 0;
 }
 
+/* A grey section whose default content is CTA links (e.g. the /live-webinar/
+   "View past webinars / Start a conversation" band): lay the buttons out
+   side-by-side and centered, matching the source. Scoped with :has() to only
+   wrappers that contain a button — so grey sections with headings (homepage
+   feature grid / testimonials) are unaffected. */
+/* stylelint-disable no-descending-specificity -- distinct section variants (.grey
+   vs .centered); the ordering rule's false-positive doesn't reflect a real override. */
+main .section.grey > .default-content-wrapper:has(> .button-container) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+main .section.grey > .default-content-wrapper:has(> .button-container) .button-container {
+  margin: 0;
+}
+
 main .section.dark {
   background-color: var(--brand-navy);
   color: #fff;
@@ -310,4 +328,31 @@ main .section.grey > .default-content-wrapper h3 {
   margin-top: 0;
   color: rgb(33 55 120);
   font-weight: 400;
+}
+
+/* Centered default-content section (source: .title.text-center intro, e.g. the
+   /live-webinar/ "A Series of Webinars…" block). Center the heading, body, and
+   CTAs; match the source's lighter navy heading and semibold 16px body; lay the
+   CTA buttons out side-by-side. Applied only to sections tagged style=centered. */
+main .section.centered > .default-content-wrapper {
+  text-align: center;
+}
+
+main .section.centered > .default-content-wrapper h1,
+main .section.centered > .default-content-wrapper h2,
+main .section.centered > .default-content-wrapper h3 {
+  margin-top: 0;
+  color: rgb(33 55 120);
+  font-weight: 400;
+}
+
+main .section.centered > .default-content-wrapper p:not(.button-container) {
+  font-size: var(--body-font-size-s);
+  font-weight: 600;
+}
+
+/* CTA buttons side-by-side and centered (source: two inline buttons on one row) */
+main .section.centered > .default-content-wrapper .button-container {
+  display: inline-block;
+  margin: 12px 8px 0;
 }

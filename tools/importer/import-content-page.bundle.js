@@ -185,10 +185,12 @@ var CustomImportScript = (() => {
     ).filter((p) => p.textContent.trim());
     const quotation = descParas.length ? descParas[0] : null;
     const attributionParas = descParas.slice(1);
+    let headerSourcedAttribution = false;
     if (attributionParas.length === 0) {
       testimonial.querySelectorAll(".testimonial__header-name, .testimonial__header-address").forEach((p) => {
         if (p.textContent.trim()) attributionParas.push(p);
       });
+      headerSourcedAttribution = attributionParas.length > 0;
     }
     if (!quotation && attributionParas.length === 0) {
       element.replaceWith(...element.childNodes);
@@ -201,7 +203,8 @@ var CustomImportScript = (() => {
     if (attributionParas.length) {
       cells.push([[document2.createComment(" field:attribution "), ...attributionParas]]);
     }
-    const block = WebImporter.Blocks.createBlock(document2, { name: "quote", cells });
+    const blockName = headerSourcedAttribution ? "quote (left)" : "quote";
+    const block = WebImporter.Blocks.createBlock(document2, { name: blockName, cells });
     element.replaceWith(block);
     if (leadTitle && leadTitle.textContent.trim()) {
       const heading = document2.createElement("h2");
@@ -316,6 +319,8 @@ var CustomImportScript = (() => {
     }
     return null;
   }
+  var CENTERED_MARKER_ATTR = "data-excat-centered-section";
+  var GREY_BAND_MARKER_ATTR = "data-excat-grey-band";
   function transform3(hookName, element, payload) {
     const sections = payload.template.sections || [];
     if (hookName === "beforeTransform") {
@@ -328,6 +333,31 @@ var CustomImportScript = (() => {
         if (section.style) hr.setAttribute(SECTION_MARKER_ATTR, section.id);
         sectionEl.before(hr);
       }
+      element.querySelectorAll(".title.text-center .cmp-title__text").forEach((title) => {
+        if (title.closest(".background-color--tertiary")) return;
+        let container = title;
+        while (container && !(container.classList && container.classList.contains("columncontainer"))) {
+          container = container.parentElement;
+        }
+        if (!container) return;
+        const openHr = document.createElement("hr");
+        openHr.setAttribute(CENTERED_MARKER_ATTR, "true");
+        container.before(openHr);
+        const next = container.nextElementSibling;
+        const nextIsTertiaryBand = next && next.classList && next.classList.contains("columncontainer") && next.classList.contains("background-color--tertiary");
+        if (!nextIsTertiaryBand) {
+          container.after(document.createElement("hr"));
+        }
+      });
+      element.querySelectorAll(".columncontainer.background-color--tertiary").forEach((band) => {
+        if (band.querySelector(".cmp-title__text") || band.querySelector(".testimonial")) return;
+        if (!band.querySelector("a")) return;
+        if (band.previousElementSibling && band.previousElementSibling.tagName === "HR" && band.previousElementSibling.hasAttribute(SECTION_MARKER_ATTR)) return;
+        const openHr = document.createElement("hr");
+        openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        band.before(openHr);
+        band.after(document.createElement("hr"));
+      });
     }
     if (hookName === "afterTransform") {
       for (let i = sections.length - 1; i >= 0; i -= 1) {
@@ -346,6 +376,23 @@ var CustomImportScript = (() => {
           if (i === 0) marker.remove();
         }
       }
+      const centeredMarker = element.querySelector(`hr[${CENTERED_MARKER_ATTR}="true"]`);
+      if (centeredMarker) {
+        centeredMarker.removeAttribute(CENTERED_MARKER_ATTR);
+        const metadataBlock = WebImporter.Blocks.createBlock(document, {
+          name: "Section Metadata",
+          cells: { style: "centered" }
+        });
+        centeredMarker.after(metadataBlock);
+      }
+      element.querySelectorAll(`hr[${GREY_BAND_MARKER_ATTR}="true"]`).forEach((greyMarker) => {
+        greyMarker.removeAttribute(GREY_BAND_MARKER_ATTR);
+        const metadataBlock = WebImporter.Blocks.createBlock(document, {
+          name: "Section Metadata",
+          cells: { style: "grey" }
+        });
+        greyMarker.after(metadataBlock);
+      });
     }
   }
 

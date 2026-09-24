@@ -8,7 +8,7 @@
   text-align: center;
 }
 
-/* decorative quotation marks (source: olive-brown corner marks) */
+/* decorative quotation marks (source: navy corner marks, rgb(33 55 120)) */
 .quote blockquote::before,
 .quote blockquote::after {
   position: absolute;
@@ -17,7 +17,7 @@
   font-weight: 700;
   font-size: 64px;
   line-height: 1;
-  color: rgb(90 71 27);
+  color: rgb(33 55 120);
 }
 
 .quote blockquote::before {
@@ -43,22 +43,68 @@
   margin: 0 0 10px;
 }
 
-/* attribution (source: centered, literal "- " dash already in content, bold name) */
+/* attribution (source: bold name/role, weight 700). Homepage embeds the name in
+   a <strong>; the webinar testimonial supplies plain name/address paragraphs —
+   bolding the whole attribution covers both instances identically. */
 .quote blockquote .quote-attribution {
   margin: 0;
   font-size: 16px;
+  font-weight: 700;
   line-height: 1.4;
   letter-spacing: -0.16px;
   color: var(--text-color);
   text-align: center;
 }
 
-.quote blockquote .quote-attribution strong {
-  font-weight: 700;
+.quote blockquote .quote-attribution p {
+  margin: 0;
 }
 
 @media (width >= 900px) {
   .quote blockquote {
     padding: 48px 32px;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Variant: left — testimonial with left-aligned body + attribution
+   (source: /live-webinar/ David Boyd testimonial, where the quote and the
+   name/role read left-aligned rather than centered). Rendered as
+   <div class="quote left"> so it survives JCR conversion as a `classes` value.
+   The base block stays centered for the homepage testimonial.
+   --------------------------------------------------------------------------- */
+.quote.left blockquote {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+/* Source vertical order: author/designation, THEN opening quote mark, THEN the
+   quote body, THEN the closing mark — i.e. the author + role sit ABOVE (outside)
+   the quotes. The blockquote is a flex column here, so the decorative ::before /
+   ::after marks are flex items too: un-absolute them and order all four elements
+   to match the source. (Left variant only; the base centered quote is untouched.) */
+.quote.left blockquote::before,
+.quote.left blockquote::after {
+  position: static;
+  display: block;
+  height: 40px;
+}
+
+.quote.left blockquote .quote-attribution {
+  order: 1;
+  margin: 0 0 4px;
+  text-align: left;
+}
+
+.quote.left blockquote::before {
+  order: 2;
+}
+
+.quote.left blockquote .quote-quotation {
+  order: 3;
+}
+
+.quote.left blockquote::after {
+  order: 4;
 }
