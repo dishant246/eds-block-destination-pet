@@ -32,7 +32,7 @@ const PAGE_TEMPLATE = {
     },
     {
       name: 'cards',
-      instances: ['.columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(3)'],
+      instances: ['.columncontainer:has(.infocards)'],
     },
     {
       name: 'columns-minimal-light',

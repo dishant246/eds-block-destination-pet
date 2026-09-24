@@ -125,6 +125,14 @@ var CustomImportScript = (() => {
         if (node.matches("p") && node.closest(".cmp-text") && textParts.includes(node.closest(".cmp-text"))) return;
         if (node.textContent.trim()) textParts.push(node);
       });
+      textScope.querySelectorAll("a[href]").forEach((a) => {
+        if (!a.textContent.trim()) return;
+        if (textParts.some((n) => n.contains && n.contains(a))) return;
+        const link = document2.createElement("a");
+        link.setAttribute("href", a.getAttribute("href"));
+        link.textContent = a.textContent.trim();
+        textParts.push(link);
+      });
       if (!image && textParts.length === 0) return;
       const imageCell = image ? [document2.createComment(" field:image "), image] : "";
       const textCell = textParts.length ? [document2.createComment(" field:text "), ...textParts] : "";
@@ -384,6 +392,23 @@ var CustomImportScript = (() => {
         band.before(openHr);
         band.after(document.createElement("hr"));
       });
+      element.querySelectorAll(".columncontainer.background-color--tertiary").forEach((band) => {
+        if (!band.querySelector(".cmp-title__text")) return;
+        if (band.querySelector(".infocards, .info-card--center")) return;
+        if (band.querySelector(".testimonial")) return;
+        if (band.querySelector("a")) return;
+        const prev = band.previousElementSibling;
+        const hasLeadingBreak = prev && prev.tagName === "HR" && (prev.hasAttribute(SECTION_MARKER_ATTR) || prev.hasAttribute(GREY_BAND_MARKER_ATTR));
+        if (!hasLeadingBreak) {
+          const openHr = document.createElement("hr");
+          openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+          band.before(openHr);
+        }
+        const next = band.nextElementSibling;
+        if (next && next.tagName !== "HR") {
+          band.after(document.createElement("hr"));
+        }
+      });
       element.querySelectorAll(".mediainfo.background-color--tertiary").forEach((bio) => {
         const prev = bio.previousElementSibling;
         if (prev && prev.tagName === "HR") {
@@ -454,7 +479,7 @@ var CustomImportScript = (() => {
       },
       {
         name: "cards",
-        instances: [".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(3)"]
+        instances: [".columncontainer:has(.infocards)"]
       },
       {
         name: "columns-minimal-light",

@@ -60,6 +60,20 @@ export default function parse(element, { document }) {
         if (node.textContent.trim()) textParts.push(node);
       });
 
+    // Some cards are LINK cards: their text cell is a button/CTA link with no
+    // title or paragraph (e.g. the sell-your-business "Sell your pet resort" /
+    // "Tools for sellers" cards). The heading/paragraph selectors above miss the
+    // bare <a>, so capture it here as a standalone anchor. Only add links that
+    // weren't already collected inside one of the text nodes above.
+    textScope.querySelectorAll('a[href]').forEach((a) => {
+      if (!a.textContent.trim()) return;
+      if (textParts.some((n) => n.contains && n.contains(a))) return;
+      const link = document.createElement('a');
+      link.setAttribute('href', a.getAttribute('href'));
+      link.textContent = a.textContent.trim();
+      textParts.push(link);
+    });
+
     // Skip fully-empty cards
     if (!image && textParts.length === 0) return;
 

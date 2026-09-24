@@ -33,6 +33,22 @@
   border-radius: 0;
 }
 
+/* Link-card variant (source: the sell-your-business "Sell your pet resort /
+   Tools for sellers / Sell your veterinary practice" cards). These cards have a
+   button link in their body; their image is a full circular photo with a thin
+   orange ring — NOT the 16:9 cropped icon badge above. Detect via :has(a.button)
+   so only these cards get the round treatment; the icon feature grid (no button)
+   keeps its 16:9 badge. The source image is square (natural ~332x333), so a 1:1
+   ratio with border-radius:50% shows the whole circle without cropping. */
+.cards > ul:has(a.button) > li .cards-card-image img {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  object-fit: cover;
+  max-width: 332px;
+  margin: 0 auto;
+  border: 1px solid var(--brand-orange);
+}
+
 .cards .cards-card-body {
   margin: 0;
 }

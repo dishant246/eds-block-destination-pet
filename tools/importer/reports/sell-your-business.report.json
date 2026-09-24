@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "url": "https://destinationpet.com/sell-your-business/",
+  "path": "sell-your-business",
+  "timestamp": "2026-09-24T16:25:30.043Z",
+  "title": "Sell Your Veterinary | Destination Pet",
+  "template": "content-page",
+  "blocks": [
+    "hero-minimal-dark",
+    "cards",
+    "cards",
+    "quote",
+    "quote",
+    "embed"
+  ]
+}

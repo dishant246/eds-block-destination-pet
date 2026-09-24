@@ -97,6 +97,43 @@ export default function transform(hookName, element, payload) {
       band.after(document.createElement('hr'));
     });
 
+    // Generic grey title-only band: a standalone tertiary `.columncontainer` that
+    // holds just a section heading (no cards, no testimonial, no CTA links) — e.g.
+    // the sell-your-business "Carry on your legacy with Destination Pet" band,
+    // which sits on grey ABOVE a separate white icon-card grid. Bound it with
+    // breaks and tag it `grey` so the following white content starts a new
+    // (default) section. EXCLUDE tertiary containers that themselves contain the
+    // card grid (homepage feature grid: title + `.infocards` live in ONE grey
+    // container) — those are a single grey section handled by the template list.
+    element.querySelectorAll('.columncontainer.background-color--tertiary').forEach((band) => {
+      if (!band.querySelector('.cmp-title__text')) return; // must have a heading
+      if (band.querySelector('.infocards, .info-card--center')) return; // not a card grid
+      if (band.querySelector('.testimonial')) return; // testimonials handled elsewhere
+      if (band.querySelector('a')) return; // CTA-only bands handled above
+
+      // Opening break: reuse a leading marker HR (e.g. a template SECTION_MARKER
+      // that already matched this band) if present; otherwise insert a fresh grey
+      // marker. Either way the band OPENS a grey section.
+      const prev = band.previousElementSibling;
+      const hasLeadingBreak = prev && prev.tagName === 'HR'
+        && (prev.hasAttribute(SECTION_MARKER_ATTR) || prev.hasAttribute(GREY_BAND_MARKER_ATTR));
+      if (!hasLeadingBreak) {
+        const openHr = document.createElement('hr');
+        openHr.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+        band.before(openHr);
+      }
+
+      // Closing break: the grey title band must END here so the following content
+      // (a separate WHITE icon-card grid, e.g. sell-your-business) starts a new
+      // default section. Add it independently of the opening break — a template
+      // section that (wrongly, for this page) grouped the band with the cards
+      // would otherwise leave them merged on grey.
+      const next = band.nextElementSibling;
+      if (next && next.tagName !== 'HR') {
+        band.after(document.createElement('hr'));
+      }
+    });
+
     // Generic grey image+text bio band: an individual `.mediainfo` block with a
     // tertiary background (e.g. the John Maresh / Rob Correia bios on the team
     // page — every other bio alternates onto grey). Unlike the CTA band above,
