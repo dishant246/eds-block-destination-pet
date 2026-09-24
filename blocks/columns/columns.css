@@ -64,11 +64,20 @@
   order: 1;
 }
 
+/* Default heading is a navy name/title (the team-bio case, e.g. "John Maresh,
+   VP of Mergers and Acquisitions"). The homepage "Who We Are" block is the
+   exception: there the h2 is a small ORANGE eyebrow paired with an h3
+   subheading — see the :has(h3) override below. */
 .columns.comfortable-light h2 {
   margin: 0 0 5px;
   font-size: 32px;
   font-weight: 400;
   line-height: 1.2;
+  color: rgb(33 55 120);
+}
+
+/* Only the eyebrow pattern (block also carries an h3) uses the orange h2. */
+.columns.comfortable-light:has(h3) h2 {
   color: var(--brand-orange);
 }
 

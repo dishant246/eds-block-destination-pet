@@ -75,23 +75,31 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/columns-comfortable-light.js
   function parse2(element, { document: document2 }) {
-    const image = element.querySelector(".media-info__left img, .cmp-image img, img");
-    const rightContent = [];
-    const right = element.querySelector(".media-info__right, .media-info__content");
-    const scope = right || element;
-    scope.querySelectorAll(".cmp-title__text, h1, h2, h3, h4, h5, h6, .cmp-text > p, .cmp-text, p").forEach((node) => {
-      if (node.matches("p") && node.closest(".cmp-text") && rightContent.includes(node.closest(".cmp-text"))) return;
-      rightContent.push(node);
+    const image = element.querySelector(".cmp-image img, img");
+    const imageColumn = image ? image.closest(".media-info__left, .media-info__right, .media-info__content") || image.closest(".cmp-image") : null;
+    const textContent = [];
+    element.querySelectorAll(".cmp-title__text, h1, h2, h3, h4, h5, h6, .cmp-text > p, .cmp-text, p").forEach((node) => {
+      if (imageColumn && imageColumn.contains(node)) return;
+      if (node.matches("p") && node.closest(".cmp-text") && textContent.includes(node.closest(".cmp-text"))) return;
+      if (!node.textContent.trim()) return;
+      textContent.push(node);
     });
-    if (!image && rightContent.length === 0) {
+    if (!image && textContent.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const leftCell = image ? [image] : [""];
-    const rightCell = rightContent.length ? rightContent : [""];
-    const cells = [
-      [leftCell, rightCell]
-    ];
+    const imageCell = image ? [image] : [""];
+    const textCell = textContent.length ? textContent : [""];
+    let row;
+    if (image && textContent.length && image.compareDocumentPosition(textContent[0]) & Node.DOCUMENT_POSITION_PRECEDING) {
+      row = [textCell, imageCell];
+    } else {
+      row = [imageCell, textCell];
+    }
+    if (element.classList && element.classList.contains("media-info--right")) {
+      row.reverse();
+    }
+    const cells = [row];
     const block = WebImporter.Blocks.createBlock(document2, { name: "columns (comfortable-light)", cells });
     element.replaceWith(block);
   }
@@ -357,6 +365,20 @@ var CustomImportScript = (() => {
         openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
         band.before(openHr);
         band.after(document.createElement("hr"));
+      });
+      element.querySelectorAll(".mediainfo.background-color--tertiary").forEach((bio) => {
+        const prev = bio.previousElementSibling;
+        if (prev && prev.tagName === "HR") {
+          prev.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        } else {
+          const openHr = document.createElement("hr");
+          openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+          bio.before(openHr);
+        }
+        const next = bio.nextElementSibling;
+        if (next && next.tagName !== "HR") {
+          bio.after(document.createElement("hr"));
+        }
       });
     }
     if (hookName === "afterTransform") {

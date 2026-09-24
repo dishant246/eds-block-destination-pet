@@ -348,7 +348,7 @@ main .section.centered > .default-content-wrapper h3 {
 
 main .section.centered > .default-content-wrapper p:not(.button-container) {
   font-size: var(--body-font-size-s);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 /* CTA buttons side-by-side and centered (source: two inline buttons on one row) */

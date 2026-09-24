@@ -96,6 +96,34 @@ export default function transform(hookName, element, payload) {
       band.before(openHr);
       band.after(document.createElement('hr'));
     });
+
+    // Generic grey image+text bio band: an individual `.mediainfo` block with a
+    // tertiary background (e.g. the John Maresh / Rob Correia bios on the team
+    // page — every other bio alternates onto grey). Unlike the CTA band above,
+    // these DO carry a heading, so the CTA-only guard skips them; handle them
+    // separately. Give each tertiary bio its own grey section by bounding it with
+    // <hr> breaks; the intervening non-tertiary bios stay on the default (white)
+    // background. Reuse GREY_BAND_MARKER_ATTR so afterTransform tags them `grey`.
+    element.querySelectorAll('.mediainfo.background-color--tertiary').forEach((bio) => {
+      // Opening break: if a break already precedes this bio (e.g. the template's
+      // leading `.mediainfo` section break before the first bio), reuse it as the
+      // grey marker instead of inserting a second adjacent <hr> (which would leave
+      // an empty section). Otherwise insert a fresh grey-marked opening break.
+      const prev = bio.previousElementSibling;
+      if (prev && prev.tagName === 'HR') {
+        prev.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      } else {
+        const openHr = document.createElement('hr');
+        openHr.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+        bio.before(openHr);
+      }
+      // Closing break so the grey ends with this bio and the next (white) bio
+      // starts a fresh section. Skip if one already follows or it's the last node.
+      const next = bio.nextElementSibling;
+      if (next && next.tagName !== 'HR') {
+        bio.after(document.createElement('hr'));
+      }
+    });
   }
 
   if (hookName === 'afterTransform') {

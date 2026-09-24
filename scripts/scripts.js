@@ -57,15 +57,25 @@ function buildScene7Rendition(src, { width, format }) {
     const k = p.split('=')[0];
     return k !== 'wid' && k !== 'fmt' && k !== 'fit';
   });
-  filtered.push(`wid=${width}`);
   filtered.push(`fmt=${format}`);
-  // fit=constrain caps the rendition at the requested width WITHOUT upscaling
-  // beyond the asset's native size and preserves the native aspect ratio.
-  // Without it, `wid=2000` on a small non-photographic asset (e.g. the 282x189
-  // handshake logo) makes Scene7 stretch width to 2000 while holding height,
-  // producing a distorted wide strip that collapses to a thin sliver at the
-  // block's display width. Large photos are unaffected (returned at native res).
-  filtered.push('fit=constrain');
+  // A Scene7 template/image-preset macro (`$Rectangle$`, `$badge$`, etc.) already
+  // fully defines the rendition's crop and dimensions on the server. Appending
+  // `wid`/`hei`/`fit` fights that preset and makes Scene7 return the WRONG crop —
+  // e.g. the bio photo `JM photo1?...&$Rectangle$` is a 533x300 landscape, but
+  // adding `wid=2000&fit=constrain` flips it to a 259x300 portrait crop that then
+  // stretches to dominate the columns row. So for macro-carrying URLs we emit
+  // only `fmt` and let the preset own the sizing.
+  const hasPresetMacro = /\$[^$]+\$/.test(query);
+  if (!hasPresetMacro) {
+    filtered.push(`wid=${width}`);
+    // fit=constrain caps the rendition at the requested width WITHOUT upscaling
+    // beyond the asset's native size and preserves the native aspect ratio.
+    // Without it, `wid=2000` on a small non-macro asset (e.g. the 282x189
+    // handshake logo) makes Scene7 stretch width to 2000 while holding height,
+    // producing a distorted wide strip that collapses to a thin sliver at the
+    // block's display width. Large photos are unaffected (returned at native res).
+    filtered.push('fit=constrain');
+  }
   return `${base}?${filtered.join('&')}`;
 }
 
