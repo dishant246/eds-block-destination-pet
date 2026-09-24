@@ -39,7 +39,7 @@ const PAGE_TEMPLATE = {
     },
     {
       name: 'quote',
-      instances: ['.columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)'],
+      instances: ['.columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)', '.testimonial'],
     },
   ],
   sections: [
