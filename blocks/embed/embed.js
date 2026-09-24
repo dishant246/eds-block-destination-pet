@@ -49,6 +49,27 @@ const embedVimeo = (url, autoplay) => {
   return embedHTML;
 };
 
+const embedJotform = (url) => {
+  // Forms are tall and their height is content-driven, so the default 16:9
+  // aspect-ratio wrapper (meant for video) clips them. Render a full-width
+  // iframe with no fixed ratio; JotForm broadcasts its rendered height to the
+  // parent via postMessage ("setHeight:<px>:<formId>"), so bind a one-time
+  // listener that resizes the matching iframe to fit — no scrollbar, no clip.
+  const embedHTML = `<iframe src="${url.href}" title="Content from JotForm"
+      style="width: 1px; min-width: 100%; border: 0; height: 800px;"
+      scrolling="no" allow="geolocation; microphone; camera"></iframe>`;
+  if (!document.body.dataset.jotformResizeBound) {
+    document.body.dataset.jotformResizeBound = 'true';
+    window.addEventListener('message', (e) => {
+      if (typeof e.data !== 'string' || !e.data.startsWith('setHeight')) return;
+      const [, height, formId] = e.data.split(':');
+      const iframe = document.querySelector(`iframe[src*="jotform.com/${formId}"]`);
+      if (iframe && height) iframe.style.height = `${parseInt(height, 10)}px`;
+    });
+  }
+  return embedHTML;
+};
+
 const embedTwitter = (url) => {
   if (!url.href.startsWith('https://twitter.com')) {
     url.href = url.href.replace('https://x.com', 'https://twitter.com');
@@ -75,6 +96,10 @@ const loadEmbed = (block, link, autoplay) => {
     {
       match: ['twitter', 'x.com'],
       embed: embedTwitter,
+    },
+    {
+      match: ['jotform'],
+      embed: embedJotform,
     },
   ];
   const config = EMBEDS_CONFIG.find((e) => e.match.some((match) => link.includes(match)));

@@ -7,6 +7,7 @@ import columnsComfortableLightParser from './parsers/columns-comfortable-light.j
 import cardsParser from './parsers/cards.js';
 import columnsMinimalLightParser from './parsers/columns-minimal-light.js';
 import quoteParser from './parsers/quote.js';
+import embedParser from './parsers/embed.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/destinationpet-cleanup.js';
@@ -41,6 +42,10 @@ const PAGE_TEMPLATE = {
       name: 'quote',
       instances: ['.columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)', '.testimonial'],
     },
+    {
+      name: 'embed',
+      instances: ['.rawhtml'],
+    },
   ],
   sections: [
     {
@@ -73,6 +78,7 @@ const parsers = {
   cards: cardsParser,
   'columns-minimal-light': columnsMinimalLightParser,
   quote: quoteParser,
+  embed: embedParser,
 };
 
 // TRANSFORMER REGISTRY

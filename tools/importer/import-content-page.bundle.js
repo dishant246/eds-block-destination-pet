@@ -221,6 +221,24 @@ var CustomImportScript = (() => {
     }
   }
 
+  // tools/importer/parsers/embed.js
+  function parse6(element, { document: document2 }) {
+    const iframe = element.querySelector('iframe[src*="jotform"]');
+    const script = element.querySelector('script[src*="jotform"]');
+    const raw = iframe && iframe.getAttribute("src") || script && script.getAttribute("src") || "";
+    const idMatch = raw.match(/jotform\.com\/(?:jsform\/)?(\d+)/);
+    if (!idMatch) {
+      return;
+    }
+    const embedUrl = `https://form.jotform.com/${idMatch[1]}`;
+    const link = document2.createElement("a");
+    link.href = embedUrl;
+    link.textContent = embedUrl;
+    const cells = [[[document2.createComment(" field:embed_uri "), link]]];
+    const block = WebImporter.Blocks.createBlock(document2, { name: "embed", cells });
+    element.replaceWith(block);
+  }
+
   // tools/importer/transformers/destinationpet-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -445,6 +463,10 @@ var CustomImportScript = (() => {
       {
         name: "quote",
         instances: [".columncontainer.background-color--tertiary.spacing__top-bottom--40px:nth-of-type(5)", ".testimonial"]
+      },
+      {
+        name: "embed",
+        instances: [".rawhtml"]
       }
     ],
     sections: [
@@ -495,7 +517,8 @@ var CustomImportScript = (() => {
     "columns-comfortable-light": parse2,
     cards: parse3,
     "columns-minimal-light": parse4,
-    quote: parse5
+    quote: parse5,
+    embed: parse6
   };
   var transformers = [
     transform,

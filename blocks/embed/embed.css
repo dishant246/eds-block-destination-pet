@@ -15,6 +15,28 @@
   margin-right: auto;
 }
 
+/* JotForm (and other full-page form) embeds: the source renders the form iframe
+   full-width so the form's own page background (e.g. the lavender band on the
+   contact page) fills edge-to-edge. Drop the 800px video cap and let it span the
+   section width, matching the source. */
+.embed.embed-jotform {
+  max-width: unset;
+  margin: 0;
+}
+
+.embed.embed-jotform > div {
+  display: block;
+}
+
+/* Full-bleed: the source form spans the entire viewport width so its lavender
+   page background reaches both edges. The standard section wrapper caps content
+   at 1280px with 32px side padding, which would leave white gutters. Neutralize
+   the cap + padding on the section content div that holds this embed. */
+main .section > div:has(> .embed.embed-jotform) {
+  max-width: unset;
+  padding: 0;
+}
+
 .embed .embed-placeholder {
   width: 100%;
   aspect-ratio: 16 / 9;

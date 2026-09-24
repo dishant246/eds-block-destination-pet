@@ -356,3 +356,10 @@ main .section.centered > .default-content-wrapper .button-container {
   display: inline-block;
   margin: 12px 8px 0;
 }
+
+/* The "Yourgi support" CTA below the contact-form embed is centered in the source
+   (its parent is text-align:center) but the default button-container is left
+   (start) aligned. Center it. Scoped to the embed section so no other CTA moves. */
+main .section.embed-container > .default-content-wrapper:has(> .button-container) {
+  text-align: center;
+}
