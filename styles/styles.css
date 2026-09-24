@@ -363,3 +363,25 @@ main .section.centered > .default-content-wrapper .button-container {
 main .section.embed-container > .default-content-wrapper:has(> .button-container) {
   text-align: center;
 }
+
+/* Intro copy above a form embed (e.g. the externship "…hands-on working
+   experience…" paragraph + "Apply Now!" heading) is centered in the source with
+   a lighter navy heading and semibold 16px body. Center + match the source, scoped
+   to the embed section's heading-bearing default-content wrapper so the CTA-only
+   wrapper (handled above) and other sections are untouched. */
+main .section.embed-container > .default-content-wrapper:has(h1, h2, h3) {
+  text-align: center;
+}
+
+main .section.embed-container > .default-content-wrapper:has(h1, h2, h3) h1,
+main .section.embed-container > .default-content-wrapper:has(h1, h2, h3) h2,
+main .section.embed-container > .default-content-wrapper:has(h1, h2, h3) h3 {
+  color: rgb(33 55 120);
+  font-size: 40px;
+  font-weight: 400;
+}
+
+main .section.embed-container > .default-content-wrapper:has(h1, h2, h3) p {
+  font-size: var(--body-font-size-s);
+  font-weight: 600;
+}
