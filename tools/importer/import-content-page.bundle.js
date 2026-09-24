@@ -215,7 +215,8 @@ var CustomImportScript = (() => {
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
       WebImporter.DOMUtils.remove(element, [
-        "link"
+        "link",
+        "noscript"
       ]);
     }
     if (hookName === TransformHook.afterTransform) {
@@ -224,6 +225,16 @@ var CustomImportScript = (() => {
         "header",
         ".footer"
       ]);
+      element.querySelectorAll('img[src*="facebook.com/tr"]').forEach((img) => {
+        const picture = img.closest("picture");
+        const node = picture || img;
+        const para = node.parentElement;
+        if (para && para.tagName === "P" && para.children.length === 1) {
+          para.remove();
+        } else {
+          node.remove();
+        }
+      });
     }
   }
 

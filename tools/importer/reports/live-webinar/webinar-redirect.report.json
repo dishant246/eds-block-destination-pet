@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "url": "https://www.destinationpet.com/live-webinar/webinar-redirect/",
+  "path": "live-webinar/webinar-redirect",
+  "timestamp": "2026-09-24T08:14:45.556Z",
+  "title": "Webinar Redirect - Destination Pet",
+  "template": "content-page",
+  "blocks": [
+    "hero-minimal-dark"
+  ]
+}
