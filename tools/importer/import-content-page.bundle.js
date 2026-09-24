@@ -92,7 +92,7 @@ var CustomImportScript = (() => {
     const cells = [
       [leftCell, rightCell]
     ];
-    const block = WebImporter.Blocks.createBlock(document2, { name: "columns-comfortable-light", cells });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "columns (comfortable-light)", cells });
     element.replaceWith(block);
   }
 
@@ -172,7 +172,7 @@ var CustomImportScript = (() => {
     const cells = [
       [contentCell]
     ];
-    const block = WebImporter.Blocks.createBlock(document2, { name: "columns-minimal-light", cells });
+    const block = WebImporter.Blocks.createBlock(document2, { name: "columns (minimal-light)", cells });
     element.replaceWith(block);
   }
 

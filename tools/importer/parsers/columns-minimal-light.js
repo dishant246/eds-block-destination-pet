@@ -1,11 +1,16 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser for columns-minimal-light. Base block: columns.
+ * Parser for the minimal-light columns variant. Base block: columns.
  * Source: https://www.destinationpet.com/ (.columncontainer.spacing__top--40px)
  * Model: core/franklin/components/columns (1 column, 1 row).
  * Columns blocks: NO field hints (per hinting rules). Cells hold default content only.
  * Generated: 2026-09-23
+ *
+ * Emitted as the EDS block variant `columns (minimal-light)` so it renders
+ * <div class="columns minimal-light"> — the variant is carried as a class on the
+ * core columns block, which survives md2jcr → JCR conversion (a distinct
+ * `columns-minimal-light` block name would be flattened to plain `columns`).
  *
  * structure.json reports 3 `.col-...` units but 2 are empty placeholders — only the
  * populated info-card column carries content (image + richtext + CTA button). This is a
@@ -50,6 +55,6 @@ export default function parse(element, { document }) {
     [contentCell],
   ];
 
-  const block = WebImporter.Blocks.createBlock(document, { name: 'columns-minimal-light', cells });
+  const block = WebImporter.Blocks.createBlock(document, { name: 'columns (minimal-light)', cells });
   element.replaceWith(block);
 }

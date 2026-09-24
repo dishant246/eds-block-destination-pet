@@ -31,3 +31,129 @@
     order: unset;
   }
 }
+
+/* Variant rules below intentionally follow the base rules and use higher
+   specificity (.columns.<variant>) to override them; disable the ordering rule. */
+/* stylelint-disable no-descending-specificity */
+
+/* ---------------------------------------------------------------------------
+   Variant: comfortable-light — "Who We Are" intro (source: .mediainfo).
+   Two-column image+text; orange eyebrow + subheading, bold story copy.
+   Rendered as <div class="columns comfortable-light"> so it survives JCR
+   conversion (the block maps to the core columns component; the variant is
+   carried as a `classes` value, not a distinct block name).
+   --------------------------------------------------------------------------- */
+.columns.comfortable-light > div {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+}
+
+.columns.comfortable-light > div > .columns-img-col {
+  order: 0;
+}
+
+.columns.comfortable-light > div > .columns-img-col img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.columns.comfortable-light > div > div {
+  order: 1;
+}
+
+.columns.comfortable-light h2 {
+  margin: 0 0 5px;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--brand-orange);
+}
+
+.columns.comfortable-light h3 {
+  margin: 0 0 5px;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--brand-orange);
+}
+
+.columns.comfortable-light p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.16px;
+  color: var(--text-color);
+}
+
+.columns.comfortable-light p strong {
+  font-weight: 700;
+}
+
+@media (width >= 900px) {
+  .columns.comfortable-light > div {
+    flex-direction: row;
+    align-items: center;
+    gap: 130px;
+    padding: 80px 0;
+  }
+
+  .columns.comfortable-light > div > div {
+    flex: 1;
+    order: unset;
+    min-width: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Variant: minimal-light — centered logo + paragraph + CTA on white
+   (source: "Sell your business" section). Rendered as
+   <div class="columns minimal-light">.
+   --------------------------------------------------------------------------- */
+.columns.minimal-light {
+  padding-top: 40px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.columns.minimal-light > div {
+  display: flex;
+  justify-content: center;
+}
+
+.columns.minimal-light > div > div {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.columns.minimal-light picture {
+  display: inline-block;
+}
+
+.columns.minimal-light img {
+  width: 282px;
+  max-width: 100%;
+  height: auto;
+}
+
+.columns.minimal-light p {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 22.4px;
+  color: var(--text-color);
+}
+
+.columns.minimal-light .button-container {
+  margin: 12px 0 0;
+}
+
+main .columns.minimal-light a.button:any-link {
+  padding: 19px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: var(--brand-orange);
+  color: #fff;
+}

@@ -1,11 +1,17 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser for columns-comfortable-light. Base block: columns.
+ * Parser for the comfortable-light columns variant. Base block: columns.
  * Source: https://www.destinationpet.com/ (.mediainfo)
  * Model: core/franklin/components/columns (2 columns, 1 row).
  * Columns blocks: NO field hints (per hinting rules). Cells hold default content only.
  * Generated: 2026-09-23
+ *
+ * Emitted as the EDS block variant `columns (comfortable-light)` so it renders
+ * <div class="columns comfortable-light"> — the variant is carried as a class on
+ * the core columns block, which is what survives md2jcr → JCR conversion (a
+ * distinct `columns-comfortable-light` block name would be flattened to plain
+ * `columns` and lose the variant styling).
  *
  * Layout: left cell = image, right cell = headings + richtext.
  * DM/Scene7 <img> is left as-is (carrier form handled by DM transformer downstream).
@@ -40,6 +46,6 @@ export default function parse(element, { document }) {
     [leftCell, rightCell],
   ];
 
-  const block = WebImporter.Blocks.createBlock(document, { name: 'columns-comfortable-light', cells });
+  const block = WebImporter.Blocks.createBlock(document, { name: 'columns (comfortable-light)', cells });
   element.replaceWith(block);
 }

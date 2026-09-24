@@ -13,8 +13,6 @@
       "cards",
       "carousel",
       "columns",
-      "columns-comfortable-light",
-      "columns-minimal-light",
       "embed",
       "fragment",
       "form",
@@ -46,36 +44,6 @@
     "id": "carousel",
     "components": [
       "carousel-item"
-    ]
-  },
-  {
-    "id": "columns-comfortable-light",
-    "components": [
-      "column"
-    ]
-  },
-  {
-    "id": "column",
-    "components": [
-      "text",
-      "image",
-      "button",
-      "title"
-    ]
-  },
-  {
-    "id": "columns-minimal-light",
-    "components": [
-      "column"
-    ]
-  },
-  {
-    "id": "column",
-    "components": [
-      "text",
-      "image",
-      "button",
-      "title"
     ]
   },
   {
