@@ -345,7 +345,7 @@ var CustomImportScript = (() => {
         container.before(openHr);
         const next = container.nextElementSibling;
         const nextIsTertiaryBand = next && next.classList && next.classList.contains("columncontainer") && next.classList.contains("background-color--tertiary");
-        if (!nextIsTertiaryBand) {
+        if (next && !nextIsTertiaryBand) {
           container.after(document.createElement("hr"));
         }
       });

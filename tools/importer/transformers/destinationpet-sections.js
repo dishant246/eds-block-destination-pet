@@ -64,14 +64,16 @@ export default function transform(hookName, element, payload) {
       container.before(openHr);
 
       // Closing break after the centered container so `centered` ends here and
-      // doesn't bleed into the following section. Skip it when the very next
-      // sibling is a tertiary CTA band — that band inserts its OWN opening break
-      // below, and two adjacent <hr>s would leave a stray empty section between.
+      // doesn't bleed into the following section. Skip it when:
+      //  - there is no following element sibling (centered block is last — a
+      //    trailing <hr> would leave a stray empty section), or
+      //  - the next sibling is a tertiary CTA band, which inserts its OWN opening
+      //    break below (two adjacent <hr>s would leave an empty section between).
       const next = container.nextElementSibling;
       const nextIsTertiaryBand = next && next.classList
         && next.classList.contains('columncontainer')
         && next.classList.contains('background-color--tertiary');
-      if (!nextIsTertiaryBand) {
+      if (next && !nextIsTertiaryBand) {
         container.after(document.createElement('hr'));
       }
     });
