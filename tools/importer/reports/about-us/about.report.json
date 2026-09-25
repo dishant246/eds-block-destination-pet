@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "url": "https://destinationpet.com/about-us/about/",
+  "path": "about-us/about",
+  "timestamp": "2026-09-25T08:03:29.978Z",
+  "title": "About Us | Destination Pet, LLC",
+  "template": "content-page",
+  "blocks": [
+    "hero-minimal-dark",
+    "columns-comfortable-light",
+    "columns-comfortable-light",
+    "columns-comfortable-light",
+    "columns-comfortable-light",
+    "columns-comfortable-light"
+  ]
+}

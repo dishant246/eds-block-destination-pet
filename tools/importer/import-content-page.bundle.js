@@ -247,6 +247,63 @@ var CustomImportScript = (() => {
     element.replaceWith(block);
   }
 
+  // tools/importer/parsers/video.js
+  function parse7(element, { document: document2 }) {
+    const video = element.querySelector("video");
+    if (!video) return;
+    const src = video.getAttribute("src") || video.querySelector("source") && video.querySelector("source").getAttribute("src") || "";
+    const poster = video.getAttribute("poster") || "";
+    if (!src) return;
+    const cells = [];
+    const link = document2.createElement("a");
+    link.href = src;
+    link.textContent = src;
+    cells.push([[document2.createComment(" field:uri "), link]]);
+    if (poster) {
+      const img = document2.createElement("img");
+      img.src = poster;
+      img.alt = "";
+      cells.push([[document2.createComment(" field:placeholder_image "), img]]);
+    }
+    const block = WebImporter.Blocks.createBlock(document2, { name: "video", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/accordion.js
+  function parse8(element, { document: document2 }) {
+    const items = Array.from(element.querySelectorAll(".cmp-accordion__item"));
+    if (items.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cells = [];
+    items.forEach((item) => {
+      const titleEl = item.querySelector(".cmp-accordion__title");
+      const panel = item.querySelector(".cmp-accordion__panel");
+      const label = titleEl ? titleEl.textContent.trim() : "";
+      if (!label && !panel) return;
+      const bodyParts = [];
+      const richScope = panel ? panel.querySelector(".richtext") || panel : null;
+      if (richScope) {
+        Array.from(richScope.children).forEach((node) => {
+          if (node.textContent.trim() || node.querySelector("img, br")) bodyParts.push(node);
+        });
+        if (bodyParts.length === 0 && richScope.textContent.trim()) {
+          const p = document2.createElement("p");
+          p.textContent = richScope.textContent.trim();
+          bodyParts.push(p);
+        }
+      }
+      cells.push([label, bodyParts.length ? bodyParts : ""]);
+    });
+    if (cells.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const block = WebImporter.Blocks.createBlock(document2, { name: "accordion", cells });
+    element.replaceWith(block);
+  }
+
   // tools/importer/transformers/destinationpet-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -355,6 +412,30 @@ var CustomImportScript = (() => {
   }
   var CENTERED_MARKER_ATTR = "data-excat-centered-section";
   var GREY_BAND_MARKER_ATTR = "data-excat-grey-band";
+  var BLUE_BAND_MARKER_ATTR = "data-excat-blue-band";
+  function isBreak(el) {
+    return !!el && el.tagName === "HR";
+  }
+  function outermostContainer(el) {
+    let found = null;
+    let node = el.parentElement;
+    while (node) {
+      if (node.classList && node.classList.contains("columncontainer")) found = node;
+      node = node.parentElement;
+    }
+    return found;
+  }
+  function openBreak(el) {
+    const prev = el.previousElementSibling;
+    if (isBreak(prev)) return prev;
+    const hr = document.createElement("hr");
+    el.before(hr);
+    return hr;
+  }
+  function closeBreak(el) {
+    const next = el.nextElementSibling;
+    if (next && !isBreak(next)) el.after(document.createElement("hr"));
+  }
   function transform3(hookName, element, payload) {
     const sections = payload.template.sections || [];
     if (hookName === "beforeTransform") {
@@ -367,47 +448,48 @@ var CustomImportScript = (() => {
         if (section.style) hr.setAttribute(SECTION_MARKER_ATTR, section.id);
         sectionEl.before(hr);
       }
+      const centeredContainers = /* @__PURE__ */ new Set();
       element.querySelectorAll(".title.text-center .cmp-title__text").forEach((title) => {
         if (title.closest(".background-color--tertiary")) return;
-        let container = title;
-        while (container && !(container.classList && container.classList.contains("columncontainer"))) {
-          container = container.parentElement;
-        }
-        if (!container) return;
-        const openHr = document.createElement("hr");
-        openHr.setAttribute(CENTERED_MARKER_ATTR, "true");
-        container.before(openHr);
-        const next = container.nextElementSibling;
-        const nextIsTertiaryBand = next && next.classList && next.classList.contains("columncontainer") && next.classList.contains("background-color--tertiary");
-        if (next && !nextIsTertiaryBand) {
-          container.after(document.createElement("hr"));
-        }
+        const container = outermostContainer(title);
+        if (!container || centeredContainers.has(container)) return;
+        centeredContainers.add(container);
+        openBreak(container).setAttribute(CENTERED_MARKER_ATTR, "true");
+        closeBreak(container);
+      });
+      element.querySelectorAll(".columncontainer.background-color--secondary").forEach((band) => {
+        const open = openBreak(band);
+        open.setAttribute(BLUE_BAND_MARKER_ATTR, "true");
+        closeBreak(band);
+        band.querySelectorAll(".columncontainer").forEach((inner) => {
+          if (!inner.querySelector(".accordion") || !inner.previousElementSibling) return;
+          const split = openBreak(inner);
+          split.setAttribute(BLUE_BAND_MARKER_ATTR, "true");
+          if (open.hasAttribute(CENTERED_MARKER_ATTR)) split.setAttribute(CENTERED_MARKER_ATTR, "true");
+        });
+      });
+      element.querySelectorAll(".columncontainer.background-color--tertiary").forEach((band) => {
+        if (!band.querySelector(".testimonial")) return;
+        const prev = band.previousElementSibling;
+        if (isBreak(prev) && prev.hasAttribute(SECTION_MARKER_ATTR)) return;
+        openBreak(band).setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        closeBreak(band);
       });
       element.querySelectorAll(".columncontainer.background-color--tertiary").forEach((band) => {
         if (band.querySelector(".cmp-title__text") || band.querySelector(".testimonial")) return;
         if (!band.querySelector("a")) return;
         if (band.previousElementSibling && band.previousElementSibling.tagName === "HR" && band.previousElementSibling.hasAttribute(SECTION_MARKER_ATTR)) return;
-        const openHr = document.createElement("hr");
-        openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
-        band.before(openHr);
-        band.after(document.createElement("hr"));
+        openBreak(band).setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        closeBreak(band);
       });
       element.querySelectorAll(".columncontainer.background-color--tertiary").forEach((band) => {
         if (!band.querySelector(".cmp-title__text")) return;
         if (band.querySelector(".infocards, .info-card--center")) return;
         if (band.querySelector(".testimonial")) return;
         if (band.querySelector("a")) return;
-        const prev = band.previousElementSibling;
-        const hasLeadingBreak = prev && prev.tagName === "HR" && (prev.hasAttribute(SECTION_MARKER_ATTR) || prev.hasAttribute(GREY_BAND_MARKER_ATTR));
-        if (!hasLeadingBreak) {
-          const openHr = document.createElement("hr");
-          openHr.setAttribute(GREY_BAND_MARKER_ATTR, "true");
-          band.before(openHr);
-        }
-        const next = band.nextElementSibling;
-        if (next && next.tagName !== "HR") {
-          band.after(document.createElement("hr"));
-        }
+        const open = openBreak(band);
+        if (!open.hasAttribute(SECTION_MARKER_ATTR)) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        closeBreak(band);
       });
       element.querySelectorAll(".mediainfo.background-color--tertiary").forEach((bio) => {
         const prev = bio.previousElementSibling;
@@ -429,27 +511,27 @@ var CustomImportScript = (() => {
         const section = sections[i];
         if (!section.style) continue;
         const marker = element.querySelector(`[${SECTION_MARKER_ATTR}="${section.id}"]`);
-        const anchor = marker || querySection(element, section.selector);
-        if (!anchor) continue;
+        if (!marker) continue;
         const metadataBlock = WebImporter.Blocks.createBlock(document, {
           name: "Section Metadata",
           cells: { style: section.style }
         });
-        anchor.after(metadataBlock);
-        if (marker) {
-          marker.removeAttribute(SECTION_MARKER_ATTR);
-          if (i === 0) marker.remove();
-        }
+        marker.after(metadataBlock);
+        marker.removeAttribute(SECTION_MARKER_ATTR);
+        if (i === 0) marker.remove();
       }
-      const centeredMarker = element.querySelector(`hr[${CENTERED_MARKER_ATTR}="true"]`);
-      if (centeredMarker) {
-        centeredMarker.removeAttribute(CENTERED_MARKER_ATTR);
+      element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}]`).forEach((marker) => {
+        const styles = [];
+        if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push("centered");
+        if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push("blue");
+        marker.removeAttribute(CENTERED_MARKER_ATTR);
+        marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
         const metadataBlock = WebImporter.Blocks.createBlock(document, {
           name: "Section Metadata",
-          cells: { style: "centered" }
+          cells: { style: styles.join(", ") }
         });
-        centeredMarker.after(metadataBlock);
-      }
+        marker.after(metadataBlock);
+      });
       element.querySelectorAll(`hr[${GREY_BAND_MARKER_ATTR}="true"]`).forEach((greyMarker) => {
         greyMarker.removeAttribute(GREY_BAND_MARKER_ATTR);
         const metadataBlock = WebImporter.Blocks.createBlock(document, {
@@ -479,7 +561,9 @@ var CustomImportScript = (() => {
       },
       {
         name: "cards",
-        instances: [".columncontainer:has(.infocards)"]
+        // Excludes the columns-minimal-light container (homepage "Sell your business"
+        // logo + text + CTA), which is built from the same infocards component.
+        instances: [".columncontainer:has(.infocards):not(.spacing__top--40px)"]
       },
       {
         name: "columns-minimal-light",
@@ -492,6 +576,14 @@ var CustomImportScript = (() => {
       {
         name: "embed",
         instances: [".rawhtml"]
+      },
+      {
+        name: "video",
+        instances: [".video"]
+      },
+      {
+        name: "accordion",
+        instances: [".accordion.panelcontainer"]
       }
     ],
     sections: [
@@ -543,7 +635,9 @@ var CustomImportScript = (() => {
     cards: parse3,
     "columns-minimal-light": parse4,
     quote: parse5,
-    embed: parse6
+    embed: parse6,
+    video: parse7,
+    accordion: parse8
   };
   var transformers = [
     transform,

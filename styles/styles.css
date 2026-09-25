@@ -72,8 +72,8 @@ body {
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  font-size: var(--body-font-size-s); /* source body copy: 16px / 22.4px */
+  line-height: 1.4;
 }
 
 body.appear {
@@ -107,10 +107,10 @@ h4,
 h5,
 h6 {
   margin-top: 0.8em;
-  margin-bottom: 0.25em;
+  margin-bottom: 5px; /* source heading rhythm: 1.2 line-height, 5px below */
   font-family: var(--heading-font-family);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   color: var(--brand-navy);
   scroll-margin: 40px;
 }
@@ -168,20 +168,22 @@ a:hover {
   text-decoration: underline;
 }
 
-/* buttons (source: filled orange pill buttons) */
+/* buttons (source: filled orange buttons — 16px/700, 19px 24px, 4px radius, no
+   border; e.g. the hero "Join our pack™", "Yourgi support", "Sell your business") */
 a.button:any-link,
 button {
   box-sizing: border-box;
   display: inline-block;
   max-width: 100%;
   margin: 12px 0;
-  border: 2px solid transparent;
+  border: 0;
   border-radius: 4px;
-  padding: 0.65em 1.6em;
+  padding: 19px 24px;
   font-family: var(--body-font-family);
+  font-size: var(--body-font-size-s);
   font-style: normal;
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 700;
+  line-height: 1.3;
   text-align: center;
   text-decoration: none;
   background-color: var(--brand-orange);
@@ -190,6 +192,13 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Source link buttons never shrink below 194px (short labels like "Join our
+   pack™" / "More about us" get wider side padding). Links only — icon buttons
+   such as the 44px video play button keep their own size. */
+a.button:any-link {
+  min-width: 194px;
 }
 
 a.button:hover,
@@ -253,6 +262,20 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
+/* Full-bleed styled sections (.grey/.dark/.light/.highlight) have margin:0 and
+   supply their own edge-to-edge background. When one directly follows a plain
+   section, that plain section's 40px bottom margin shows as a stray white gap
+   above the colored band (e.g. the about page hero → grey "Our story"). Collapse
+   the preceding section's bottom margin so the colored section butts flush up to
+   it, matching the source. */
+main > .section:has(+ .section.grey),
+main > .section:has(+ .section.dark),
+main > .section:has(+ .section.light),
+main > .section:has(+ .section.highlight),
+main > .section:has(+ .section.blue) {
+  margin-bottom: 0;
+}
+
 @media (width >= 900px) {
   main > .section > div {
     padding: 0 32px;
@@ -272,6 +295,46 @@ main .section.grey {
   background-color: var(--brand-grey);
   margin: 0;
   padding: 40px 0;
+}
+
+/* light-blue section variant (source: `background-color--secondary`, e.g. the
+   life-at-dp "Job Shadow Experience" band). Consecutive blue sections read as one
+   continuous band: the intro and its accordion groups are separate sections only
+   so the groups can sit in columns. */
+main .section.blue {
+  display: flow-root; /* contain child margins so none leak out as white gaps */
+  background-color: var(--brand-light-blue);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.blue:has(+ .section.blue) {
+  padding-bottom: 0;
+}
+
+main .section.blue + .section.blue {
+  padding-top: 24px;
+}
+
+/* Headed accordion groups (heading + accordion, repeated) sit side-by-side on
+   desktop, one column per group, like the source's "CSR & ACA Positions" /
+   "All Other Positions" columns. The grid flows column-first, so each group's
+   heading stacks directly above its own accordion. */
+@media (width >= 900px) {
+  main .section:has(> .default-content-wrapper + .accordion-wrapper + .default-content-wrapper + .accordion-wrapper) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 604px));
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    justify-content: center;
+    column-gap: 24px;
+  }
+
+  main .section:has(> .default-content-wrapper + .accordion-wrapper + .default-content-wrapper + .accordion-wrapper) > div {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
 }
 
 /* A grey section whose default content is CTA links (e.g. the /live-webinar/

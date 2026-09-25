@@ -101,6 +101,22 @@
   font-weight: 700;
 }
 
+/* Statement variant (source: the about page Mission/Vision/Values staggered
+   image+text rows). These comfortable-light blocks have NO heading — just a
+   short bold-keyword statement paragraph — and the source sets it larger and
+   heavier than the bio/story body: 20px, weight 600, line-height 28px, with the
+   keyword bold (b/strong weight 900). Scope via :not(:has(h1,h2,h3)) so the
+   heading-bearing instances (team bios, homepage "Who We Are") keep 16px/400. */
+.columns.comfortable-light:not(:has(h1, h2, h3)) p {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.columns.comfortable-light:not(:has(h1, h2, h3)) p strong {
+  font-weight: 900;
+}
+
 @media (width >= 900px) {
   .columns.comfortable-light > div {
     flex-direction: row;

@@ -20,6 +20,43 @@ function querySection(root, selectors) {
 
 const CENTERED_MARKER_ATTR = 'data-excat-centered-section';
 const GREY_BAND_MARKER_ATTR = 'data-excat-grey-band';
+const BLUE_BAND_MARKER_ATTR = 'data-excat-blue-band';
+
+// True when `el` is a section break inserted by this transformer.
+function isBreak(el) {
+  return !!el && el.tagName === 'HR';
+}
+
+// Outermost `.columncontainer` ancestor of `el` (the page-level section container).
+// Titles nested inside a band (e.g. the accordion-group titles inside the
+// light-blue Job Shadow band) resolve to the band itself, so the band is bounded
+// once as a whole instead of being split around each nested title.
+function outermostContainer(el) {
+  let found = null;
+  let node = el.parentElement;
+  while (node) {
+    if (node.classList && node.classList.contains('columncontainer')) found = node;
+    node = node.parentElement;
+  }
+  return found;
+}
+
+// Opening break before `el`: reuse an adjacent break (e.g. the previous
+// section's closing break) instead of inserting a second one, which would leave
+// an empty section between them. Returns the break so callers can mark it.
+function openBreak(el) {
+  const prev = el.previousElementSibling;
+  if (isBreak(prev)) return prev;
+  const hr = document.createElement('hr');
+  el.before(hr);
+  return hr;
+}
+
+// Closing break after `el`, unless it's the last node or a break already follows.
+function closeBreak(el) {
+  const next = el.nextElementSibling;
+  if (next && !isBreak(next)) el.after(document.createElement('hr'));
+}
 
 export default function transform(hookName, element, payload) {
   const sections = payload.template.sections || [];
@@ -49,33 +86,50 @@ export default function transform(hookName, element, payload) {
     // EXCLUDE titles inside a tertiary/grey container — those already belong to a
     // styled (grey) section (e.g. the homepage "We work together to be…" and
     // "Testimonials" headings) and must not get a second, conflicting section.
+    const centeredContainers = new Set();
     element.querySelectorAll('.title.text-center .cmp-title__text').forEach((title) => {
       if (title.closest('.background-color--tertiary')) return;
-      // Raw section container = nearest .columncontainer ancestor.
-      let container = title;
-      while (container && !(container.classList && container.classList.contains('columncontainer'))) {
-        container = container.parentElement;
-      }
-      if (!container) return;
+      // Bound the page-level container once, however many centered titles it holds.
+      const container = outermostContainer(title);
+      if (!container || centeredContainers.has(container)) return;
+      centeredContainers.add(container);
 
-      // Opening break before the centered container (carries the marker).
-      const openHr = document.createElement('hr');
-      openHr.setAttribute(CENTERED_MARKER_ATTR, 'true');
-      container.before(openHr);
+      // Opening break (carries the marker); closing break so `centered` doesn't
+      // bleed into the following section.
+      openBreak(container).setAttribute(CENTERED_MARKER_ATTR, 'true');
+      closeBreak(container);
+    });
 
-      // Closing break after the centered container so `centered` ends here and
-      // doesn't bleed into the following section. Skip it when:
-      //  - there is no following element sibling (centered block is last — a
-      //    trailing <hr> would leave a stray empty section), or
-      //  - the next sibling is a tertiary CTA band, which inserts its OWN opening
-      //    break below (two adjacent <hr>s would leave an empty section between).
-      const next = container.nextElementSibling;
-      const nextIsTertiaryBand = next && next.classList
-        && next.classList.contains('columncontainer')
-        && next.classList.contains('background-color--tertiary');
-      if (next && !nextIsTertiaryBand) {
-        container.after(document.createElement('hr'));
-      }
+    // Light-blue band (source `background-color--secondary`, e.g. the life-at-dp
+    // "Job Shadow Experience" band). Tag it `blue` — on top of `centered` when the
+    // loop above already bounded it. A nested container holding accordion groups
+    // gets its own break carrying the same markers: the band stays one continuous
+    // blue area, but the groups form their own section so they can be laid out
+    // side-by-side like the source's two columns.
+    element.querySelectorAll('.columncontainer.background-color--secondary').forEach((band) => {
+      const open = openBreak(band);
+      open.setAttribute(BLUE_BAND_MARKER_ATTR, 'true');
+      closeBreak(band);
+
+      band.querySelectorAll('.columncontainer').forEach((inner) => {
+        if (!inner.querySelector('.accordion') || !inner.previousElementSibling) return;
+        const split = openBreak(inner);
+        split.setAttribute(BLUE_BAND_MARKER_ATTR, 'true');
+        if (open.hasAttribute(CENTERED_MARKER_ATTR)) split.setAttribute(CENTERED_MARKER_ATTR, 'true');
+      });
+    });
+
+    // Grey testimonial band: a tertiary container holding a `.testimonial` (e.g.
+    // the life-at-dp "Watch Your Career Soar" quote). Bound it by content rather
+    // than the template's homepage-positional selector, so preceding content (the
+    // life-at-dp video) keeps its own white section. When a template section
+    // break already marks the band (homepage Testimonials), leave it to that.
+    element.querySelectorAll('.columncontainer.background-color--tertiary').forEach((band) => {
+      if (!band.querySelector('.testimonial')) return;
+      const prev = band.previousElementSibling;
+      if (isBreak(prev) && prev.hasAttribute(SECTION_MARKER_ATTR)) return;
+      openBreak(band).setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      closeBreak(band);
     });
 
     // Generic grey CTA-band detection: a standalone `.columncontainer` with a
@@ -91,10 +145,8 @@ export default function transform(hookName, element, payload) {
       if (band.previousElementSibling && band.previousElementSibling.tagName === 'HR'
         && band.previousElementSibling.hasAttribute(SECTION_MARKER_ATTR)) return; // already bounded
 
-      const openHr = document.createElement('hr');
-      openHr.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
-      band.before(openHr);
-      band.after(document.createElement('hr'));
+      openBreak(band).setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      closeBreak(band);
     });
 
     // Generic grey title-only band: a standalone tertiary `.columncontainer` that
@@ -111,27 +163,18 @@ export default function transform(hookName, element, payload) {
       if (band.querySelector('.testimonial')) return; // testimonials handled elsewhere
       if (band.querySelector('a')) return; // CTA-only bands handled above
 
-      // Opening break: reuse a leading marker HR (e.g. a template SECTION_MARKER
-      // that already matched this band) if present; otherwise insert a fresh grey
-      // marker. Either way the band OPENS a grey section.
-      const prev = band.previousElementSibling;
-      const hasLeadingBreak = prev && prev.tagName === 'HR'
-        && (prev.hasAttribute(SECTION_MARKER_ATTR) || prev.hasAttribute(GREY_BAND_MARKER_ATTR));
-      if (!hasLeadingBreak) {
-        const openHr = document.createElement('hr');
-        openHr.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
-        band.before(openHr);
-      }
+      // Opening break: reuse an adjacent break. A template SECTION_MARKER that
+      // already matched this band attaches its own grey metadata; otherwise mark
+      // it grey here. Either way the band OPENS a grey section.
+      const open = openBreak(band);
+      if (!open.hasAttribute(SECTION_MARKER_ATTR)) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
 
       // Closing break: the grey title band must END here so the following content
       // (a separate WHITE icon-card grid, e.g. sell-your-business) starts a new
       // default section. Add it independently of the opening break — a template
       // section that (wrongly, for this page) grouped the band with the cards
       // would otherwise leave them merged on grey.
-      const next = band.nextElementSibling;
-      if (next && next.tagName !== 'HR') {
-        band.after(document.createElement('hr'));
-      }
+      closeBreak(band);
     });
 
     // Generic grey image+text bio band: an individual `.mediainfo` block with a
@@ -164,40 +207,41 @@ export default function transform(hookName, element, payload) {
   }
 
   if (hookName === 'afterTransform') {
-    // Parsers have now run and may have replaced section elements. Anchor each
-    // styled section's Section Metadata block to whichever still exists.
+    // Anchor each template section's Section Metadata to the break inserted in
+    // beforeTransform. With no marker there is no break, so the metadata would
+    // style whatever section the element happens to sit in — skip, never guess.
     for (let i = sections.length - 1; i >= 0; i -= 1) {
       const section = sections[i];
       if (!section.style) continue;
 
       const marker = element.querySelector(`[${SECTION_MARKER_ATTR}="${section.id}"]`);
-      const anchor = marker || querySection(element, section.selector);
-      if (!anchor) continue; // neither survived — skip, never guess
+      if (!marker) continue;
 
       const metadataBlock = WebImporter.Blocks.createBlock(document, {
         name: 'Section Metadata',
         cells: { style: section.style },
       });
-      anchor.after(metadataBlock);
-
-      if (marker) {
-        marker.removeAttribute(SECTION_MARKER_ATTR);
-        if (i === 0) marker.remove(); // section 0 never gets a real leading break
-      }
+      marker.after(metadataBlock);
+      marker.removeAttribute(SECTION_MARKER_ATTR);
+      if (i === 0) marker.remove(); // section 0 never gets a real leading break
     }
 
-    // Centered default-content section: the opening <hr> marker was inserted in
-    // beforeTransform. Attach a `centered` Section Metadata block right after that
-    // marker so it becomes the first node of the centered section.
-    const centeredMarker = element.querySelector(`hr[${CENTERED_MARKER_ATTR}="true"]`);
-    if (centeredMarker) {
-      centeredMarker.removeAttribute(CENTERED_MARKER_ATTR);
+    // Centered and/or light-blue sections: the opening <hr> markers were inserted
+    // in beforeTransform. Attach one Section Metadata block right after each so it
+    // becomes the first node of its section (e.g. `centered, blue` for the Job
+    // Shadow band, whose headings are centered on the blue background).
+    element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}]`).forEach((marker) => {
+      const styles = [];
+      if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push('centered');
+      if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push('blue');
+      marker.removeAttribute(CENTERED_MARKER_ATTR);
+      marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
       const metadataBlock = WebImporter.Blocks.createBlock(document, {
         name: 'Section Metadata',
-        cells: { style: 'centered' },
+        cells: { style: styles.join(', ') },
       });
-      centeredMarker.after(metadataBlock);
-    }
+      marker.after(metadataBlock);
+    });
 
     // Grey CTA-band section: opening <hr> marker inserted in beforeTransform.
     // Attach a `grey` Section Metadata block right after it.

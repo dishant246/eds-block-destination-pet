@@ -43,13 +43,12 @@
   margin: 0 0 10px;
 }
 
-/* attribution (source: bold name/role, weight 700). Homepage embeds the name in
-   a <strong>; the webinar testimonial supplies plain name/address paragraphs —
-   bolding the whole attribution covers both instances identically. */
+/* attribution (source: .testimonial description <p> is weight 400 with only the
+   name in <b> at 700 — homepage + /join-our-pack/life-at-dp/). */
 .quote blockquote .quote-attribution {
   margin: 0;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.4;
   letter-spacing: -0.16px;
   color: var(--text-color);
@@ -58,6 +57,11 @@
 
 .quote blockquote .quote-attribution p {
   margin: 0;
+}
+
+.quote blockquote .quote-attribution strong,
+.quote blockquote .quote-attribution b {
+  font-weight: 700;
 }
 
 @media (width >= 900px) {
@@ -91,9 +95,11 @@
   height: 40px;
 }
 
+/* name/role come as plain paragraphs here and stay bold (weight 700) */
 .quote.left blockquote .quote-attribution {
   order: 1;
   margin: 0 0 4px;
+  font-weight: 700;
   text-align: left;
 }
 

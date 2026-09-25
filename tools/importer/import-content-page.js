@@ -8,6 +8,8 @@ import cardsParser from './parsers/cards.js';
 import columnsMinimalLightParser from './parsers/columns-minimal-light.js';
 import quoteParser from './parsers/quote.js';
 import embedParser from './parsers/embed.js';
+import videoParser from './parsers/video.js';
+import accordionParser from './parsers/accordion.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/destinationpet-cleanup.js';
@@ -32,7 +34,9 @@ const PAGE_TEMPLATE = {
     },
     {
       name: 'cards',
-      instances: ['.columncontainer:has(.infocards)'],
+      // Excludes the columns-minimal-light container (homepage "Sell your business"
+      // logo + text + CTA), which is built from the same infocards component.
+      instances: ['.columncontainer:has(.infocards):not(.spacing__top--40px)'],
     },
     {
       name: 'columns-minimal-light',
@@ -45,6 +49,14 @@ const PAGE_TEMPLATE = {
     {
       name: 'embed',
       instances: ['.rawhtml'],
+    },
+    {
+      name: 'video',
+      instances: ['.video'],
+    },
+    {
+      name: 'accordion',
+      instances: ['.accordion.panelcontainer'],
     },
   ],
   sections: [
@@ -79,6 +91,8 @@ const parsers = {
   'columns-minimal-light': columnsMinimalLightParser,
   quote: quoteParser,
   embed: embedParser,
+  video: videoParser,
+  accordion: accordionParser,
 };
 
 // TRANSFORMER REGISTRY
