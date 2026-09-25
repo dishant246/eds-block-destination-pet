@@ -93,6 +93,10 @@ export default async function decorate(block) {
   content.innerHTML = fragment.html;
   resolveImages(content, fragment.url);
 
+  // authoring pipelines (DA) wrap list-item labels in <p>: unwrap them so every
+  // item is li > a (+ sub-list), whichever way the fragment was stored
+  content.querySelectorAll('li > p:first-child').forEach((p) => p.replaceWith(...p.childNodes));
+
   // links to other sites (e.g. the social icons) open in a new tab, like the source
   content.querySelectorAll('a[href]').forEach((a) => {
     const url = new URL(a.href, window.location.href);
