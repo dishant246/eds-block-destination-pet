@@ -23,6 +23,19 @@ const GREY_BAND_MARKER_ATTR = 'data-excat-grey-band';
 const BLUE_BAND_MARKER_ATTR = 'data-excat-blue-band';
 const SUBHEAD_MARKER_ATTR = 'data-excat-subhead';
 const TEXT_PRIMARY_MARKER_ATTR = 'data-excat-text-primary';
+const NAVY_BAND_MARKER_ATTR = 'data-excat-navy-band';
+const SPACED_MARKER_ATTR = 'data-excat-spaced';
+const PLAIN_HEADINGS_MARKER_ATTR = 'data-excat-plain-headings';
+
+// Long-form copy (e.g. the /privacy-policy/ text): a container holding nothing
+// but one long richtext. The source separates its paragraphs with empty
+// (&nbsp;) spacer paragraphs, which the importer drops before transformers run,
+// so the section is tagged `spaced` to keep the source paragraph gap.
+function isLongFormCopy(container) {
+  if (container.querySelector('.title, img, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo, .image, .button')) return false;
+  const texts = container.querySelectorAll('.richtext');
+  return texts.length === 1 && texts[0].querySelectorAll('p').length >= 40;
+}
 
 // Source text-style scale on intro copy: `subhead-1` = 20px/600,
 // `subhead-2` / `subhead-3` = 16px/600, no class = 16px/400.
@@ -125,6 +138,11 @@ export default function transform(hookName, element, payload) {
       const open = openBreak(container);
       open.setAttribute(CENTERED_MARKER_ATTR, 'true');
       if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      // A page-level navy (`background-color--primary`) title band, e.g. the
+      // /privacy-policy/ "Privacy Policy" heading: full-width navy, white title.
+      if (container.matches('.background-color--primary') && !container.querySelector('img, a')) {
+        open.setAttribute(NAVY_BAND_MARKER_ATTR, 'true');
+      }
       const subhead = subheadStyle(container);
       if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
       closeBreak(container);
@@ -134,10 +152,14 @@ export default function transform(hookName, element, payload) {
     // network…" paragraph): a top-level container holding only richtext whose
     // paragraphs are all authored `text-align: center`. Same centered section,
     // plus the source text style and, for `color--primary` copy, navy text.
+    // Headings authored inside the richtext (e.g. the /about-us/tradeshows-events/
+    // "COMING SOON!" h2) count too; unlike `.title` headings they keep the body
+    // text colour, so the section is also tagged `plain-headings`.
     element.querySelectorAll('.columncontainer').forEach((container) => {
       if (outermostContainer(container) || centeredContainers.has(container)) return;
       if (container.querySelector('.title, img, a, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo')) return;
-      const paras = Array.from(container.querySelectorAll('.richtext p')).filter((p) => p.textContent.trim());
+      const paras = Array.from(container.querySelectorAll('.richtext p, .richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6'))
+        .filter((p) => p.textContent.trim());
       if (!paras.length || !paras.every((p) => /text-align:\s*center/i.test(p.getAttribute('style') || ''))) return;
       centeredContainers.add(container);
 
@@ -145,8 +167,19 @@ export default function transform(hookName, element, payload) {
       open.setAttribute(CENTERED_MARKER_ATTR, 'true');
       const subhead = subheadStyle(container);
       if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
-      if (container.querySelector('.richtext.color--primary')) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, 'true');
+      const primary = container.querySelector('.richtext.color--primary');
+      if (primary) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, 'true');
+      if (!primary && paras.some((p) => p.tagName !== 'P')) open.setAttribute(PLAIN_HEADINGS_MARKER_ATTR, 'true');
       if (container.matches('.background-color--tertiary')) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      closeBreak(container);
+    });
+
+    // Long-form copy (see isLongFormCopy): its
+    // own section, tagged `spaced`.
+    element.querySelectorAll('.columncontainer').forEach((container) => {
+      if (outermostContainer(container) || centeredContainers.has(container)) return;
+      if (!isLongFormCopy(container)) return;
+      openBreak(container).setAttribute(SPACED_MARKER_ATTR, 'true');
       closeBreak(container);
     });
 
@@ -280,15 +313,21 @@ export default function transform(hookName, element, payload) {
     // in beforeTransform. Attach one Section Metadata block right after each so it
     // becomes the first node of its section (e.g. `centered, blue` for the Job
     // Shadow band, whose headings are centered on the blue background).
-    element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}]`).forEach((marker) => {
+    element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}], hr[${SPACED_MARKER_ATTR}]`).forEach((marker) => {
       const styles = [];
       if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push('centered');
       if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push('blue');
+      if (marker.hasAttribute(NAVY_BAND_MARKER_ATTR)) styles.push('navy');
+      if (marker.hasAttribute(SPACED_MARKER_ATTR)) styles.push('spaced');
+      marker.removeAttribute(NAVY_BAND_MARKER_ATTR);
+      marker.removeAttribute(SPACED_MARKER_ATTR);
       // A grey intro band is also centered: fold `grey` into this single
       // metadata block (EDS only reads a section's first Section Metadata).
       if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push('grey');
       if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
       if (marker.hasAttribute(TEXT_PRIMARY_MARKER_ATTR)) styles.push('text-primary');
+      if (marker.hasAttribute(PLAIN_HEADINGS_MARKER_ATTR)) styles.push('plain-headings');
+      marker.removeAttribute(PLAIN_HEADINGS_MARKER_ATTR);
       marker.removeAttribute(TEXT_PRIMARY_MARKER_ATTR);
       marker.removeAttribute(CENTERED_MARKER_ATTR);
       marker.removeAttribute(BLUE_BAND_MARKER_ATTR);

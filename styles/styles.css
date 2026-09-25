@@ -395,6 +395,63 @@ main .section.dark {
   padding: 40px 0;
 }
 
+/* Navy title band (source: a page-level `background-color--primary` container
+   holding only the page title, e.g. /privacy-policy/): full-width primary navy,
+   white 32px (desktop 40px) / 400 centered title with 44px/49px (desktop
+   52px/57px) above/below — the container's 40px (32px) padding plus the title
+   column's 12px and the title's 5px bottom margin. */
+main .section.navy {
+  background-color: rgb(33 55 120);
+  margin: 0;
+  padding: 44px 0 49px;
+}
+
+/* (white title colour: see the `.navy` rule after the centered-section
+   headings, which would otherwise override it) */
+main .section.navy > .default-content-wrapper h1,
+main .section.navy > .default-content-wrapper h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+/* Long-form copy (source: legal text whose paragraphs are separated by empty
+   spacer paragraphs, e.g. /privacy-policy/): 42px between paragraphs (10px
+   margin + a 22px empty line + 10px); 44px (desktop 52px) below a navy band;
+   16px side gutters on mobile. */
+main .section.spaced > .default-content-wrapper p {
+  margin: 0 0 42px;
+}
+
+/* content below a navy title band starts 44px (desktop 52px) under it */
+main > .section.navy + .section {
+  margin-top: 44px;
+}
+
+main > .section.spaced > div {
+  padding: 0 16px;
+}
+
+@media (width >= 900px) {
+  main .section.navy {
+    padding: 52px 0 57px;
+  }
+
+  main .section.navy > .default-content-wrapper h1,
+  main .section.navy > .default-content-wrapper h2 {
+    font-size: 40px;
+  }
+
+  main > .section.navy + .section {
+    margin-top: 52px;
+  }
+
+  main > .section.spaced > div {
+    padding: 0 32px;
+  }
+}
+
 main .section.dark h1,
 main .section.dark h2,
 main .section.dark h3,
@@ -440,6 +497,40 @@ main .section.centered > .default-content-wrapper h3 {
   margin-top: 0;
   color: rgb(33 55 120);
   font-weight: 400;
+}
+
+/* Navy title band (see `.section.navy` above): white title, also when centered */
+main .section.navy > .default-content-wrapper > h1,
+main .section.navy > .default-content-wrapper > h2 {
+  color: #fff;
+}
+
+/* `plain-headings`: headings authored inside body copy (source richtext, e.g.
+   the /about-us/tradeshows-events/ "COMING SOON!" h2) keep the body text
+   colour and a tighter 1.1 line-height, unlike navy `.title` headings. */
+main .section.plain-headings > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--text-color);
+  line-height: 1.1;
+}
+
+/* source richtext h2: 24px (desktop 32px); its 5px (desktop 10px) top margin
+   is added to the section's gap below a navy band (margins would collapse). */
+main .section.plain-headings > .default-content-wrapper h2 {
+  font-size: 24px;
+}
+
+main > .section.navy + .section.plain-headings {
+  margin-top: 49px;
+}
+
+@media (width >= 900px) {
+  main .section.plain-headings > .default-content-wrapper h2 {
+    font-size: 32px;
+  }
+
+  main > .section.navy + .section.plain-headings {
+    margin-top: 62px;
+  }
 }
 
 main .section.centered > .default-content-wrapper p:not(.button-container) {

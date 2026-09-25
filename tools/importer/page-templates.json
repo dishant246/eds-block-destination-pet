@@ -19,7 +19,11 @@
         "https://www.destinationpet.com/sell-your-business/",
         "https://www.destinationpet.com/sell-your-business/sell-your-pet-resort/",
         "https://www.destinationpet.com/sell-your-business/sell-your-veterinary-practice/",
-        "https://destinationpet.com/about-us/meet-the-team/business-development-leaders/"
+        "https://destinationpet.com/about-us/meet-the-team/business-development-leaders/",
+        "https://destinationpet.com/privacy-policy/",
+        "https://destinationpet.com/terms-and-conditions/",
+        "https://destinationpet.com/about-us/ccpa-request/",
+        "https://destinationpet.com/about-us/tradeshows-events/"
       ],
       "coverageGaps": [],
       "description": "General content page: full-width hero banner followed by stacked content sections (image+text, icon feature grid, CTA blocks, testimonials)",

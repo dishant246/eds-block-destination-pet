@@ -33,6 +33,42 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Grey Band",
+              "value": "grey"
+            },
+            {
+              "name": "Light Blue Band",
+              "value": "blue"
+            },
+            {
+              "name": "Navy Title Band",
+              "value": "navy"
+            },
+            {
+              "name": "Centered",
+              "value": "centered"
+            },
+            {
+              "name": "Subhead Text (16px semibold)",
+              "value": "subhead"
+            },
+            {
+              "name": "Large Subhead Text (20px semibold)",
+              "value": "subhead-large"
+            },
+            {
+              "name": "Navy Text",
+              "value": "text-primary"
+            },
+            {
+              "name": "Spaced Paragraphs",
+              "value": "spaced"
+            },
+            {
+              "name": "Plain Headings (body text colour)",
+              "value": "plain-headings"
             }
           ]
         }

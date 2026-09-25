@@ -587,6 +587,14 @@ var CustomImportScript = (() => {
   var BLUE_BAND_MARKER_ATTR = "data-excat-blue-band";
   var SUBHEAD_MARKER_ATTR = "data-excat-subhead";
   var TEXT_PRIMARY_MARKER_ATTR = "data-excat-text-primary";
+  var NAVY_BAND_MARKER_ATTR = "data-excat-navy-band";
+  var SPACED_MARKER_ATTR = "data-excat-spaced";
+  var PLAIN_HEADINGS_MARKER_ATTR = "data-excat-plain-headings";
+  function isLongFormCopy(container) {
+    if (container.querySelector(".title, img, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo, .image, .button")) return false;
+    const texts = container.querySelectorAll(".richtext");
+    return texts.length === 1 && texts[0].querySelectorAll("p").length >= 40;
+  }
   function subheadStyle(container) {
     const copy = Array.from(container.querySelectorAll(".richtext")).filter((t) => !(t.closest(".container__column") || t.parentElement).querySelector("img"));
     if (copy.some((t) => t.matches(".subhead-1"))) return "subhead-large";
@@ -643,6 +651,9 @@ var CustomImportScript = (() => {
         const open = openBreak(container);
         open.setAttribute(CENTERED_MARKER_ATTR, "true");
         if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        if (container.matches(".background-color--primary") && !container.querySelector("img, a")) {
+          open.setAttribute(NAVY_BAND_MARKER_ATTR, "true");
+        }
         const subhead = subheadStyle(container);
         if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
         closeBreak(container);
@@ -650,15 +661,23 @@ var CustomImportScript = (() => {
       element.querySelectorAll(".columncontainer").forEach((container) => {
         if (outermostContainer(container) || centeredContainers.has(container)) return;
         if (container.querySelector(".title, img, a, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo")) return;
-        const paras = Array.from(container.querySelectorAll(".richtext p")).filter((p) => p.textContent.trim());
+        const paras = Array.from(container.querySelectorAll(".richtext p, .richtext h1, .richtext h2, .richtext h3, .richtext h4, .richtext h5, .richtext h6")).filter((p) => p.textContent.trim());
         if (!paras.length || !paras.every((p) => /text-align:\s*center/i.test(p.getAttribute("style") || ""))) return;
         centeredContainers.add(container);
         const open = openBreak(container);
         open.setAttribute(CENTERED_MARKER_ATTR, "true");
         const subhead = subheadStyle(container);
         if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
-        if (container.querySelector(".richtext.color--primary")) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, "true");
+        const primary = container.querySelector(".richtext.color--primary");
+        if (primary) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, "true");
+        if (!primary && paras.some((p) => p.tagName !== "P")) open.setAttribute(PLAIN_HEADINGS_MARKER_ATTR, "true");
         if (container.matches(".background-color--tertiary")) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        closeBreak(container);
+      });
+      element.querySelectorAll(".columncontainer").forEach((container) => {
+        if (outermostContainer(container) || centeredContainers.has(container)) return;
+        if (!isLongFormCopy(container)) return;
+        openBreak(container).setAttribute(SPACED_MARKER_ATTR, "true");
         closeBreak(container);
       });
       element.querySelectorAll(".columncontainer.background-color--secondary").forEach((band) => {
@@ -724,13 +743,19 @@ var CustomImportScript = (() => {
         marker.removeAttribute(SECTION_MARKER_ATTR);
         if (i === 0) marker.remove();
       }
-      element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}]`).forEach((marker) => {
+      element.querySelectorAll(`hr[${CENTERED_MARKER_ATTR}], hr[${BLUE_BAND_MARKER_ATTR}], hr[${SPACED_MARKER_ATTR}]`).forEach((marker) => {
         const styles = [];
         if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push("centered");
         if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push("blue");
+        if (marker.hasAttribute(NAVY_BAND_MARKER_ATTR)) styles.push("navy");
+        if (marker.hasAttribute(SPACED_MARKER_ATTR)) styles.push("spaced");
+        marker.removeAttribute(NAVY_BAND_MARKER_ATTR);
+        marker.removeAttribute(SPACED_MARKER_ATTR);
         if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push("grey");
         if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
         if (marker.hasAttribute(TEXT_PRIMARY_MARKER_ATTR)) styles.push("text-primary");
+        if (marker.hasAttribute(PLAIN_HEADINGS_MARKER_ATTR)) styles.push("plain-headings");
+        marker.removeAttribute(PLAIN_HEADINGS_MARKER_ATTR);
         marker.removeAttribute(TEXT_PRIMARY_MARKER_ATTR);
         marker.removeAttribute(CENTERED_MARKER_ATTR);
         marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
