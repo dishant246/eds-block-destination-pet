@@ -380,6 +380,99 @@ var CustomImportScript = (() => {
     element.replaceWith(block);
   }
 
+  // tools/importer/parsers/cards-logos.js
+  function locationName(alt) {
+    return (alt || "").replace(/[-_]+/g, " ").replace(/\s*logo\s*$/i, "").replace(/\s+/g, " ").trim();
+  }
+  function columnCards(column) {
+    const cards = [];
+    column.querySelectorAll(".image a img, .richtext p, .title .cmp-title__text").forEach((node) => {
+      if (node.tagName === "IMG") {
+        const a = node.closest("a");
+        cards.push({ img: node, href: a ? a.getAttribute("href") : "", name: locationName(node.alt), captions: [] });
+      } else if (node.textContent.trim() && cards.length) {
+        cards[cards.length - 1].captions.push({ heading: !!node.closest(".title"), text: node.textContent.trim() });
+      }
+    });
+    return cards;
+  }
+  function parse10(element, { document: document2 }) {
+    const bands = element.querySelectorAll(".background-color--primary .cmp-title__text");
+    if (bands.length !== 1) return;
+    const stateName = bands[0].textContent.trim();
+    const band = bands[0].closest(".columncontainer.background-color--primary") || bands[0];
+    let rows = band.parentElement ? Array.from(band.parentElement.children).filter((c) => c !== band && c.querySelector(".image a img")) : [];
+    if (!rows.length) rows = [element];
+    const cardRows = [];
+    rows.forEach((row) => {
+      const layout = row.querySelector(".container__layout-section");
+      let columns = layout ? Array.from(layout.children).filter((c) => c.querySelector(".image a img")) : [];
+      if (!columns.length) columns = [row];
+      const perColumn = columns.map(columnCards).filter((cards) => cards.length);
+      const depth = Math.max(0, ...perColumn.map((cards) => cards.length));
+      for (let i = 0; i < depth; i += 1) {
+        const cards = perColumn.map((colCards) => colCards[i]).filter(Boolean);
+        if (cards.length) cardRows.push(cards);
+      }
+    });
+    if (cardRows.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const toCells = (cards) => cards.map((card) => {
+      const img = card.img.cloneNode(true);
+      const text = [document2.createComment(" field:text ")];
+      card.captions.forEach((caption) => {
+        const el = document2.createElement(caption.heading ? "h3" : "p");
+        el.textContent = caption.text;
+        text.push(el);
+      });
+      if (card.href) {
+        const p = document2.createElement("p");
+        const link = document2.createElement("a");
+        link.setAttribute("href", card.href);
+        link.textContent = card.name || stateName;
+        p.append(link);
+        text.push(p);
+      }
+      return [[document2.createComment(" field:image "), img], text.length > 1 ? text : ""];
+    });
+    const heading = document2.createElement("h2");
+    heading.textContent = stateName;
+    const blocks = cardRows.map((cards) => WebImporter.Blocks.createBlock(document2, { name: "cards (logos)", cells: toCells(cards) }));
+    element.replaceWith(heading, ...blocks);
+  }
+
+  // tools/importer/parsers/columns-link-list.js
+  function slugifyHash(href, text) {
+    const target = href.length > 1 ? decodeURIComponent(href.slice(1)) : text;
+    return `#${target.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+  }
+  function parse11(element, { document: document2 }) {
+    const columns = Array.from(element.querySelectorAll(".container__column")).filter((col) => col.querySelector(".link a[href]") && !col.querySelector(".container__column"));
+    const cells = columns.map((col) => {
+      const list = document2.createElement("ul");
+      col.querySelectorAll(".link a[href]").forEach((a) => {
+        const text = a.textContent.trim();
+        if (!text) return;
+        const href = a.getAttribute("href");
+        const link = document2.createElement("a");
+        link.setAttribute("href", href.startsWith("#") ? slugifyHash(href, text) : href);
+        link.textContent = text;
+        const li = document2.createElement("li");
+        li.append(link);
+        list.append(li);
+      });
+      return list.children.length ? list : "";
+    }).filter(Boolean);
+    if (cells.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const block = WebImporter.Blocks.createBlock(document2, { name: "columns (link-list)", cells: [cells] });
+    element.replaceWith(block);
+  }
+
   // tools/importer/transformers/destinationpet-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -388,6 +481,9 @@ var CustomImportScript = (() => {
         "link",
         "noscript"
       ]);
+      element.querySelectorAll("span.icon-location").forEach((icon) => {
+        icon.replaceWith(document.createTextNode(":location: "));
+      });
     }
     if (hookName === TransformHook.afterTransform) {
       WebImporter.DOMUtils.remove(element, [
@@ -490,9 +586,11 @@ var CustomImportScript = (() => {
   var GREY_BAND_MARKER_ATTR = "data-excat-grey-band";
   var BLUE_BAND_MARKER_ATTR = "data-excat-blue-band";
   var SUBHEAD_MARKER_ATTR = "data-excat-subhead";
+  var TEXT_PRIMARY_MARKER_ATTR = "data-excat-text-primary";
   function subheadStyle(container) {
-    if (container.querySelector(".richtext.subhead-1")) return "subhead-large";
-    if (container.querySelector(".richtext.subhead-2, .richtext.subhead-3")) return "subhead";
+    const copy = Array.from(container.querySelectorAll(".richtext")).filter((t) => !(t.closest(".container__column") || t.parentElement).querySelector("img"));
+    if (copy.some((t) => t.matches(".subhead-1"))) return "subhead-large";
+    if (copy.some((t) => t.matches(".subhead-2, .subhead-3"))) return "subhead";
     return null;
   }
   function isBreak(el) {
@@ -547,6 +645,20 @@ var CustomImportScript = (() => {
         if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
         const subhead = subheadStyle(container);
         if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
+        closeBreak(container);
+      });
+      element.querySelectorAll(".columncontainer").forEach((container) => {
+        if (outermostContainer(container) || centeredContainers.has(container)) return;
+        if (container.querySelector(".title, img, a, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo")) return;
+        const paras = Array.from(container.querySelectorAll(".richtext p")).filter((p) => p.textContent.trim());
+        if (!paras.length || !paras.every((p) => /text-align:\s*center/i.test(p.getAttribute("style") || ""))) return;
+        centeredContainers.add(container);
+        const open = openBreak(container);
+        open.setAttribute(CENTERED_MARKER_ATTR, "true");
+        const subhead = subheadStyle(container);
+        if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
+        if (container.querySelector(".richtext.color--primary")) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, "true");
+        if (container.matches(".background-color--tertiary")) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
         closeBreak(container);
       });
       element.querySelectorAll(".columncontainer.background-color--secondary").forEach((band) => {
@@ -618,6 +730,8 @@ var CustomImportScript = (() => {
         if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push("blue");
         if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push("grey");
         if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
+        if (marker.hasAttribute(TEXT_PRIMARY_MARKER_ATTR)) styles.push("text-primary");
+        marker.removeAttribute(TEXT_PRIMARY_MARKER_ATTR);
         marker.removeAttribute(CENTERED_MARKER_ATTR);
         marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
         marker.removeAttribute(GREY_BAND_MARKER_ATTR);
@@ -656,6 +770,16 @@ var CustomImportScript = (() => {
         // those parsers would otherwise claim individually.
         name: "carousel",
         instances: [".carousel.panelcontainer"]
+      },
+      {
+        // A state container: one navy title band + linked location logos.
+        name: "cards-logos",
+        instances: [".columncontainer:has(.background-color--primary .cmp-title__text):has(.image a img)"]
+      },
+      {
+        // In-page link index (e.g. the our-locations state list).
+        name: "columns-link-list",
+        instances: ['.columncontainer:has(.link a.link__text[href^="#"]):not(:has(.title))']
       },
       {
         name: "columns-comfortable-light",
@@ -740,7 +864,9 @@ var CustomImportScript = (() => {
     embed: parse6,
     video: parse7,
     accordion: parse8,
-    carousel: parse9
+    carousel: parse9,
+    "cards-logos": parse10,
+    "columns-link-list": parse11
   };
   var transformers = [
     transform,

@@ -182,3 +182,58 @@ main .columns.minimal-light a.button:any-link {
   background-color: var(--brand-orange);
   color: #fff;
 }
+
+/* ---------------------------------------------------------------------------
+   Variant: link-list — the /our-locations/ state index (source: a 4-column
+   row of centered orange anchor links). Rendered as
+   <div class="columns link-list">: one row, one <ul> of links per cell.
+   Source: 4 equal col-lg-3 columns (12px padding, 314px wide at 1440 in a
+   1256px row = the 1280px content width less 12px each side); links 16px/700
+   orange, 18px line pitch, no underline and no hover change; stacked (one
+   column per row, 12px 8px padding) on mobile.
+   --------------------------------------------------------------------------- */
+
+/* source: the CTA above sits in its own 12px-padded column, so the link cells
+   start 24px below the button (its 12px bottom margin + 12px here) */
+.columns.link-list {
+  margin-top: 12px;
+}
+
+.columns.link-list > div > div {
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.columns.link-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.columns.link-list li {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+.columns.link-list a:any-link,
+.columns.link-list a:hover {
+  display: block;
+  color: var(--brand-orange);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (width >= 900px) {
+  .columns.link-list > div {
+    align-items: stretch;
+    gap: 0;
+    margin: 0 12px;
+  }
+
+  .columns.link-list > div > div {
+    padding: 12px;
+  }
+}

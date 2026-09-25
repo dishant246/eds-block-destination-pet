@@ -25,6 +25,14 @@ export default function transform(hookName, element, payload) {
       'link',
       'noscript',
     ]);
+
+    // Source icon-font glyphs → EDS icon syntax. The location pin
+    // (`span.icon-location`, e.g. inside the our-locations "Pet lifestyle
+    // centers" / "Find a location near you!" buttons) becomes `:location:`,
+    // which EDS renders from /icons/location.svg.
+    element.querySelectorAll('span.icon-location').forEach((icon) => {
+      icon.replaceWith(document.createTextNode(':location: '));
+    });
   }
 
   if (hookName === TransformHook.afterTransform) {

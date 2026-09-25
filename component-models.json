@@ -161,6 +161,28 @@
     ]
   },
   {
+    "id": "cards",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "value": "",
+        "label": "Style",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Logos",
+            "value": "logos"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "card",
     "fields": [
       {
@@ -271,6 +293,10 @@
           {
             "name": "Minimal Light",
             "value": "minimal-light"
+          },
+          {
+            "name": "Link List",
+            "value": "link-list"
           }
         ]
       }

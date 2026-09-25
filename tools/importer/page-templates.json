@@ -37,6 +37,18 @@
           ]
         },
         {
+          "name": "cards-logos",
+          "instances": [
+            ".columncontainer:has(.background-color--primary .cmp-title__text):has(.image a img)"
+          ]
+        },
+        {
+          "name": "columns-link-list",
+          "instances": [
+            ".columncontainer:has(.link a.link__text[href^=\"#\"]):not(:has(.title))"
+          ]
+        },
+        {
           "name": "columns-comfortable-light",
           "instances": [
             ".mediainfo"

@@ -11,6 +11,8 @@ import embedParser from './parsers/embed.js';
 import videoParser from './parsers/video.js';
 import accordionParser from './parsers/accordion.js';
 import carouselParser from './parsers/carousel.js';
+import cardsLogosParser from './parsers/cards-logos.js';
+import columnsLinkListParser from './parsers/columns-link-list.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/destinationpet-cleanup.js';
@@ -34,6 +36,16 @@ const PAGE_TEMPLATE = {
       // those parsers would otherwise claim individually.
       name: 'carousel',
       instances: ['.carousel.panelcontainer'],
+    },
+    {
+      // A state container: one navy title band + linked location logos.
+      name: 'cards-logos',
+      instances: ['.columncontainer:has(.background-color--primary .cmp-title__text):has(.image a img)'],
+    },
+    {
+      // In-page link index (e.g. the our-locations state list).
+      name: 'columns-link-list',
+      instances: ['.columncontainer:has(.link a.link__text[href^="#"]):not(:has(.title))'],
     },
     {
       name: 'columns-comfortable-light',
@@ -101,6 +113,8 @@ const parsers = {
   video: videoParser,
   accordion: accordionParser,
   carousel: carouselParser,
+  'cards-logos': cardsLogosParser,
+  'columns-link-list': columnsLinkListParser,
 };
 
 // TRANSFORMER REGISTRY

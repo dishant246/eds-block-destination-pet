@@ -338,7 +338,60 @@ function a11yLinks(main) {
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
+/**
+ * Turns `:icon-name:` text markers into `<span class="icon icon-icon-name">`.
+ * The EDS delivery pipeline already does this for published pages (so this is a
+ * no-op there); content served as-is (e.g. local previews of imported pages)
+ * still carries the raw markers, such as the our-locations `:location:` pins.
+ * @param {Element} main The container element
+ */
+function decorateIconMarkers(main) {
+  const marker = /:([a-z][a-z0-9-]*):/g;
+  const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) {
+    if (walker.currentNode.nodeValue.match(marker)) nodes.push(walker.currentNode);
+  }
+  nodes.forEach((node) => {
+    const fragment = document.createDocumentFragment();
+    node.nodeValue.split(marker).forEach((part, i) => {
+      if (i % 2) {
+        const icon = document.createElement('span');
+        icon.className = `icon icon-${part}`;
+        fragment.append(icon);
+      } else if (part) {
+        fragment.append(part);
+      }
+    });
+    node.replaceWith(fragment);
+  });
+}
+
+/**
+ * Opens links to other sites in a new tab, like the source (e.g. the
+ * /our-locations/ map buttons and location logos). Pages on the current host,
+ * in-page anchors, mailto: and tel: links keep opening in place. Absolute links
+ * to not-yet-migrated destinationpet.com pages count as external until the site
+ * is served from that domain.
+ * @param {Element} main The container element
+ */
+function decorateExternalLinks(main) {
+  main.querySelectorAll('a[href]').forEach((a) => {
+    let url;
+    try {
+      url = new URL(a.href);
+    } catch (e) {
+      return;
+    }
+    if (!url.protocol.startsWith('http') || url.hostname === window.location.hostname) return;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+}
+
 export function decorateMain(main) {
+  decorateIconMarkers(main);
+  decorateExternalLinks(main);
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);

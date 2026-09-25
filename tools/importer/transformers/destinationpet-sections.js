@@ -22,12 +22,17 @@ const CENTERED_MARKER_ATTR = 'data-excat-centered-section';
 const GREY_BAND_MARKER_ATTR = 'data-excat-grey-band';
 const BLUE_BAND_MARKER_ATTR = 'data-excat-blue-band';
 const SUBHEAD_MARKER_ATTR = 'data-excat-subhead';
+const TEXT_PRIMARY_MARKER_ATTR = 'data-excat-text-primary';
 
 // Source text-style scale on intro copy: `subhead-1` = 20px/600,
 // `subhead-2` / `subhead-3` = 16px/600, no class = 16px/400.
+// Image captions (richtext sharing a column with an image, e.g. the
+// our-locations logo captions) are not intro copy and don't count.
 function subheadStyle(container) {
-  if (container.querySelector('.richtext.subhead-1')) return 'subhead-large';
-  if (container.querySelector('.richtext.subhead-2, .richtext.subhead-3')) return 'subhead';
+  const copy = Array.from(container.querySelectorAll('.richtext'))
+    .filter((t) => !(t.closest('.container__column') || t.parentElement).querySelector('img'));
+  if (copy.some((t) => t.matches('.subhead-1'))) return 'subhead-large';
+  if (copy.some((t) => t.matches('.subhead-2, .subhead-3'))) return 'subhead';
   return null;
 }
 
@@ -122,6 +127,26 @@ export default function transform(hookName, element, payload) {
       if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
       const subhead = subheadStyle(container);
       if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
+      closeBreak(container);
+    });
+
+    // Centered intro copy WITHOUT a title (e.g. the our-locations "Our nationwide
+    // network…" paragraph): a top-level container holding only richtext whose
+    // paragraphs are all authored `text-align: center`. Same centered section,
+    // plus the source text style and, for `color--primary` copy, navy text.
+    element.querySelectorAll('.columncontainer').forEach((container) => {
+      if (outermostContainer(container) || centeredContainers.has(container)) return;
+      if (container.querySelector('.title, img, a, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo')) return;
+      const paras = Array.from(container.querySelectorAll('.richtext p')).filter((p) => p.textContent.trim());
+      if (!paras.length || !paras.every((p) => /text-align:\s*center/i.test(p.getAttribute('style') || ''))) return;
+      centeredContainers.add(container);
+
+      const open = openBreak(container);
+      open.setAttribute(CENTERED_MARKER_ATTR, 'true');
+      const subhead = subheadStyle(container);
+      if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
+      if (container.querySelector('.richtext.color--primary')) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, 'true');
+      if (container.matches('.background-color--tertiary')) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
       closeBreak(container);
     });
 
@@ -263,6 +288,8 @@ export default function transform(hookName, element, payload) {
       // metadata block (EDS only reads a section's first Section Metadata).
       if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push('grey');
       if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
+      if (marker.hasAttribute(TEXT_PRIMARY_MARKER_ATTR)) styles.push('text-primary');
+      marker.removeAttribute(TEXT_PRIMARY_MARKER_ATTR);
       marker.removeAttribute(CENTERED_MARKER_ATTR);
       marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
       marker.removeAttribute(GREY_BAND_MARKER_ATTR);

@@ -51,6 +51,10 @@
             {
               "name": "Minimal Light",
               "value": "minimal-light"
+            },
+            {
+              "name": "Link List",
+              "value": "link-list"
             }
           ]
         }
@@ -60,11 +64,18 @@
   "filters": [
     {
       "id": "columns",
-      "components": ["column"]
+      "components": [
+        "column"
+      ]
     },
     {
       "id": "column",
-      "components": ["text", "image", "button", "title"]
+      "components": [
+        "text",
+        "image",
+        "button",
+        "title"
+      ]
     }
   ]
 }

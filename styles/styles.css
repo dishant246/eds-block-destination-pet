@@ -247,6 +247,18 @@ main img {
   width: 100%;
 }
 
+/* Icon inside a CTA button (e.g. the :location: pin in "Pet lifestyle centers" /
+   "Find a location near you!"). Source: a 16px icon-font glyph (16px advance, the
+   pin ink ~10x16 inset 3px) followed by a space, so the label starts ~8px after
+   the pin. The SVG is 12x16; the 1px/3px side margins keep the same 16px advance
+   and the ~8px gap to the label. The glyph drops 1px below the baseline. */
+a.button .icon {
+  width: 12px;
+  height: 16px;
+  margin: 0 3px 0 1px;
+  vertical-align: -1px;
+}
+
 /* sections */
 main > .section {
   margin: 40px 0;
@@ -355,6 +367,27 @@ main .section.grey > .default-content-wrapper:has(> .button-container):not(:has(
   margin: 0;
 }
 
+/* Three (or more) button band (source: the /our-locations/ "Pet lifestyle
+   centers / Veterinary care centers / Vet-pet self hub" legend). The source puts
+   each button in its own equal column (col-lg-4 in a 1304px row, i.e. the 1280px
+   content width plus the 12px column gutters) and centers it there; on mobile the
+   columns stack, 24px apart (the buttons' own 12px top/bottom margins). Scoped
+   with :nth-child(3) so the two-button /live-webinar/ band keeps the flex row
+   above. */
+main .section.grey > .default-content-wrapper:has(> .button-container:nth-child(3)):not(:has(> :not(.button-container))) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 0;
+}
+
+@media (width >= 900px) {
+  main .section.grey > .default-content-wrapper:has(> .button-container:nth-child(3)):not(:has(> :not(.button-container))) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 1304px;
+  }
+}
+
 main .section.dark {
   background-color: var(--brand-navy);
   color: #fff;
@@ -425,6 +458,82 @@ main .section.subhead-large > .default-content-wrapper p:not(.button-container) 
   font-size: 20px;
   font-weight: 600;
   line-height: 28px;
+}
+
+/* `text-primary` = the source's richtext `color--primary` (e.g. the
+   /our-locations/ intro): copy in the primary navy. */
+main .section.text-primary > .default-content-wrapper p:not(.button-container) {
+  color: rgb(33 55 120);
+}
+
+/* /our-locations/ intro spacing. Source: 72px from the hero to the navy intro
+   copy and 62px from it to the grey legend band (the copy's 5px margin + 57px),
+   then 52px from the band to "100s of locations nationwide". Scoped to the
+   primary-navy intro and to the section holding the state index link list. */
+@media (width >= 900px) {
+  main > .section.text-primary {
+    margin-top: 72px;
+  }
+
+  main > .section.text-primary:has(+ .section.grey) {
+    padding-bottom: 57px;
+  }
+
+  main > .section.grey + .section:has(> .columns-wrapper > .columns.link-list) {
+    margin-top: 52px;
+  }
+}
+
+/* Source: the "Find a location near you!" CTA sits 5px under its heading (the
+   heading's own bottom margin); its bottom spacing to the state index is kept. */
+main .section:has(> .columns-wrapper > .columns.link-list) > .default-content-wrapper .button-container {
+  margin-top: 0;
+}
+
+main .section:has(> .columns-wrapper > .columns.link-list) > .default-content-wrapper a.button:any-link {
+  margin-top: 0;
+}
+
+/* State heading band (source: /our-locations/ — each state title sits in a
+   `background-color--primary` container above its logo grid): the h2 directly
+   above a `cards logos` block renders as a content-width navy band with white
+   centered text. Source band: 40px (mobile 32px) container padding + 12px column
+   padding above the title, the title's 5px bottom margin + 12px + 40px (32px)
+   below; 32px (mobile 24px) / 400 / 1.2 title. Scoped with :has() to sections
+   holding a `.cards.logos` block so no other heading changes. The section's top
+   margin reproduces the source gap between the previous section's last row and
+   the band (12px column + 40px/32px container padding on each side). */
+main > .section:has(> .cards-wrapper > .cards.logos) {
+  margin-top: 88px;
+}
+
+main .section:has(> .cards-wrapper > .cards.logos) > .default-content-wrapper > h2 {
+  margin: 0;
+  padding: 44px 16px 49px;
+  background-color: rgb(33 55 120);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
+}
+
+@media (width >= 900px) {
+  main > .section:has(> .cards-wrapper > .cards.logos) {
+    margin-top: 104px;
+  }
+
+  main .section:has(> .cards-wrapper > .cards.logos) > .default-content-wrapper > h2 {
+    padding: 52px 24px 57px;
+    font-size: 32px;
+  }
+}
+
+/* Between consecutive states the source leaves 36px from the last logo row to
+   the next navy band (its 12px column padding + this 24px), on mobile and
+   desktop; the larger gap above stays only for the first state after the index. */
+main > .section:has(> .cards-wrapper > .cards.logos) + .section:has(> .cards-wrapper > .cards.logos) {
+  margin-top: 24px;
 }
 
 /* CTA buttons side-by-side and centered (source: two inline buttons on one row) */

@@ -34,7 +34,7 @@
 }
 
 /* Paragraph-only icon cards (see the block below): icon at intrinsic size */
-.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-image img {
+.cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-image img {
   width: auto;
   max-width: 100%;
   height: auto;
@@ -49,7 +49,7 @@
    so only these cards get the round treatment; the icon feature grid (no button)
    keeps its 16:9 badge. The source image is square (natural ~332x333), so a 1:1
    ratio with border-radius:50% shows the whole circle without cropping. */
-.cards > ul:has(a.button) > li .cards-card-image img {
+.cards:not(.logos) > ul:has(a.button) > li .cards-card-image img {
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   object-fit: cover;
@@ -64,7 +64,7 @@
    the sell-your-business feature grid (h3) and its link cards (a.button) keep
    their styling. Source renders each icon WHOLE at its intrinsic size
    (192x192 / 277x189 / 282x189), centred, never cropped or stretched. */
-.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
+.cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
   /* source: outer 12px column padding above; below, 12px column padding +
      the 32px (mobile) / 40px (desktop) section spacing — the next (grey)
      section collapses this section's bottom margin */
@@ -72,7 +72,7 @@
 }
 
 /* source mobile column padding (desktop: 12px all round, as base li) */
-.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
+.cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
   padding: 12px 8px;
 }
 
@@ -82,7 +82,7 @@
 
 /* source info-card__text: 24px above the copy; below, 24px (mobile) /
    40px (desktop) text padding + 24px wrapper padding */
-.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
+.cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
   padding: 24px 0 48px;
 }
 
@@ -121,15 +121,117 @@
   }
 
   /* paragraph-only icon cards: source row is inset 12px inside the column */
-  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
+  .cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
     padding: 12px 12px 52px;
   }
 
-  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
+  .cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
     padding: 12px;
   }
 
-  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
+  .cards:not(.logos) > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
     padding-bottom: 64px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Variant: logos — the /our-locations/ partner logo grid (one block per state).
+   Each card = a logo image, an optional location caption ("Dunwoody",
+   "Charlotte / North Carolina") and the location's site link. EDS decorates
+   that lone link as a.button; the source shows no button — the logo itself is
+   the link — so the link text is visually hidden (still in the accessibility
+   tree) and stretched over the whole card with ::after.
+   Source values (1440): rows of up to 4 col-lg-3 cells (314px incl. 12px
+   padding) in a 1256px row = the 1280px content width less 12px each side;
+   300x300 logos (290 in a 4-up cell), centered, never cropped; 16px row
+   spacing + 12px cell padding (40px between logo rows); 28px from the state
+   band to the first row; caption 20px/600/28px primary navy, 10px (mobile 5px)
+   under the logo. Fewer than 4 logos spread across the row (source 2-up /
+   3-up / 1-up rows), so cells grow to fill it.
+   --------------------------------------------------------------------------- */
+/* stylelint-disable no-descending-specificity -- the .logos rules and the
+   :not(.logos) link-card / paragraph-only rules above never match the same
+   element, so their relative order/specificity is irrelevant. */
+.cards.logos > ul {
+  margin: 16px 0 0;
+  row-gap: 0;
+}
+
+.cards.logos > ul > li {
+  position: relative;
+  flex: 1 1 100%;
+  max-width: none;
+  padding: 12px;
+}
+
+.cards.logos .cards-card-image img {
+  display: inline-block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+}
+
+.cards.logos .cards-card-body p:not(.button-container) {
+  margin: 5px 0 10px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  color: rgb(33 55 120);
+  text-align: center;
+}
+
+.cards.logos .cards-card-body .button-container {
+  margin: 0;
+}
+
+/* visually hidden, still-focusable location link */
+.cards.logos .cards-card-body a.button:any-link,
+.cards.logos .cards-card-body a.button:hover,
+.cards.logos .cards-card-body a.button:focus {
+  position: static;
+  display: block;
+  width: 1px;
+  min-width: 0;
+  height: 1px;
+  margin: -1px 0 0;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  background: none;
+  color: transparent;
+  outline: none;
+}
+
+/* stretch the link over the whole card (the li is the containing block; the
+   link's overflow:hidden does not clip it) */
+.cards.logos .cards-card-body a.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.cards.logos .cards-card-body a.button:focus-visible::after {
+  outline: 2px solid rgb(33 55 120);
+  outline-offset: -2px;
+}
+
+@media (width >= 900px) {
+  .cards.logos > ul {
+    margin: 16px 12px 0;
+    row-gap: 16px;
+  }
+
+  .cards.logos > ul > li {
+    flex: 1 1 25%;
+    max-width: none;
+  }
+
+  .cards.logos .cards-card-body p:not(.button-container) {
+    margin-top: 10px;
   }
 }
