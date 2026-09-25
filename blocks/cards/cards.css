@@ -33,6 +33,15 @@
   border-radius: 0;
 }
 
+/* Paragraph-only icon cards (see the block below): icon at intrinsic size */
+.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-image img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: fill;
+}
+
 /* Link-card variant (source: the sell-your-business "Sell your pet resort /
    Tools for sellers / Sell your veterinary practice" cards). These cards have a
    button link in their body; their image is a full circular photo with a thin
@@ -49,8 +58,32 @@
   border: 1px solid var(--brand-orange);
 }
 
+/* Paragraph-only icon cards (source: vet-practice `.infocards` row — outline
+   icon + a centred paragraph, no heading and no link). Detected by the absence
+   of any heading or link in the card bodies, so the homepage badge grid (h2/h3),
+   the sell-your-business feature grid (h3) and its link cards (a.button) keep
+   their styling. Source renders each icon WHOLE at its intrinsic size
+   (192x192 / 277x189 / 282x189), centred, never cropped or stretched. */
+.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
+  /* source: outer 12px column padding above; below, 12px column padding +
+     the 32px (mobile) / 40px (desktop) section spacing — the next (grey)
+     section collapses this section's bottom margin */
+  padding: 12px 0 44px;
+}
+
+/* source mobile column padding (desktop: 12px all round, as base li) */
+.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
+  padding: 12px 8px;
+}
+
 .cards .cards-card-body {
   margin: 0;
+}
+
+/* source info-card__text: 24px above the copy; below, 24px (mobile) /
+   40px (desktop) text padding + 24px wrapper padding */
+.cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
+  padding: 24px 0 48px;
 }
 
 .cards .cards-card-body h2 {
@@ -85,5 +118,18 @@
   .cards > ul > li {
     flex: 0 0 33.333%;
     max-width: none;
+  }
+
+  /* paragraph-only icon cards: source row is inset 12px inside the column */
+  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) {
+    padding: 12px 12px 52px;
+  }
+
+  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) > li {
+    padding: 12px;
+  }
+
+  .cards > ul:not(:has(.cards-card-body :is(h1, h2, h3, h4, h5, h6, a))) .cards-card-body {
+    padding-bottom: 64px;
   }
 }

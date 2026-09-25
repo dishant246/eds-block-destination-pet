@@ -71,6 +71,49 @@ function bindEvents(block) {
   });
 }
 
+// Source step slider advances every ~3.5s.
+const AUTOPLAY_INTERVAL = 3500;
+
+/**
+ * `autoplay` variant: advance one slide per interval while the carousel is in
+ * view. Pauses while hovered or while focus is inside (so keyboard users can
+ * operate the controls), and never runs when the visitor prefers reduced motion.
+ */
+function startAutoplay(block) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let timer = null;
+  let inView = false;
+  let hovered = false;
+  let focused = false;
+
+  const stop = () => {
+    clearInterval(timer);
+    timer = null;
+  };
+  const start = () => {
+    stop();
+    if (!inView || hovered || focused) return;
+    timer = setInterval(() => {
+      showSlide(block, parseInt(block.dataset.activeSlide || 0, 10) + 1);
+    }, AUTOPLAY_INTERVAL);
+  };
+
+  block.addEventListener('mouseenter', () => { hovered = true; stop(); });
+  block.addEventListener('mouseleave', () => { hovered = false; start(); });
+  block.addEventListener('focusin', () => { focused = true; stop(); });
+  block.addEventListener('focusout', (e) => {
+    if (block.contains(e.relatedTarget)) return;
+    focused = false;
+    start();
+  });
+
+  new IntersectionObserver((entries) => {
+    inView = entries.some((entry) => entry.isIntersecting);
+    if (inView) start(); else stop();
+  }, { threshold: 0.5 }).observe(block);
+}
+
 function createSlide(row, slideIndex, carouselId) {
   const slide = document.createElement('li');
   slide.dataset.slideIndex = slideIndex;
@@ -148,5 +191,6 @@ export default async function decorate(block) {
 
   if (!isSingleSlide) {
     bindEvents(block);
+    if (block.classList.contains('autoplay')) startAutoplay(block);
   }
 }

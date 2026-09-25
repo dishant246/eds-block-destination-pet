@@ -8,7 +8,8 @@
   text-align: center;
 }
 
-/* decorative quotation marks (source: navy corner marks, rgb(33 55 120)) */
+/* decorative quotation marks (source: the icon-font glyph renders brown
+   rgb(90 71 27); only its wrapper element is navy, and that color isn't visible) */
 .quote blockquote::before,
 .quote blockquote::after {
   position: absolute;
@@ -17,7 +18,7 @@
   font-weight: 700;
   font-size: 64px;
   line-height: 1;
-  color: rgb(33 55 120);
+  color: rgb(90 71 27);
 }
 
 .quote blockquote::before {

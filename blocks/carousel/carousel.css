@@ -1,3 +1,30 @@
+/*
+ * Carousel — source: destinationpet.com slick sliders.
+ * One slide visible at a time, transparent slides (they sit on the section
+ * background), small dots centred below, optional plain arrows top-right.
+ * Two slide styles are detected from content:
+ *   - text slides (empty image cell): centred testimonial quote with quote marks
+ *   - icon slides (image cell has an <img>): centred icon above an orange title
+ */
+
+.carousel {
+  --carousel-dot-color: rgb(242 240 235);
+  --carousel-dot-active-color: var(--brand-light-blue);
+  --carousel-arrow-color: var(--brand-light-blue);
+  --carousel-quote-color: rgb(90 71 27);
+  --carousel-focus-color: var(--brand-navy);
+
+  /* source slider sits 5px below the section heading (empty slider title margin) */
+  margin-top: 5px;
+}
+
+/* Testimonial-style carousels (no slide images): source sits inside an inset
+   column (12px column padding + 16px top spacing) — 38px below the heading,
+   16px extra below, and inset 8px (mobile) / 24px (desktop) from the section. */
+.carousel:not(:has(.carousel-slide-image img)) {
+  margin: 38px 8px 16px;
+}
+
 .carousel .carousel-slides-container {
   position: relative;
 }
@@ -9,11 +36,13 @@
   padding: 0;
 }
 
+/* scroller: showSlide() scrolls this list; keep scroll-snap intact */
 .carousel .carousel-slides {
   display: flex;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   overflow: scroll clip;
+  scrollbar-width: none;
 }
 
 .carousel .carousel-slides::-webkit-scrollbar {
@@ -21,133 +50,233 @@
 }
 
 .carousel .carousel-slide {
+  box-sizing: border-box;
   flex: 0 0 100%;
+  width: 100%;
   scroll-snap-align: start;
+  position: relative;
+  background-color: transparent;
+}
+
+/* empty image cell (text-only slides) */
+.carousel .carousel-slide-image:not(:has(img)) {
+  display: none;
+}
+
+.carousel .carousel-slide-content > :first-child {
+  margin-top: 0;
+}
+
+.carousel .carousel-slide-content > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- text (testimonial) slides ---------- */
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content {
+  padding: 24px 24px 4px;
+  text-align: center;
+}
+
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content p {
+  margin: 0 0 10px;
+  font-size: var(--body-font-size-s);
+  font-weight: 400;
+  line-height: 22.4px;
+  color: var(--text-color);
+}
+
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content p:last-child {
+  margin-bottom: 0;
+}
+
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content strong {
+  font-weight: 700;
+}
+
+/* opening (top-left) and closing (bottom-left, rotated) quote marks */
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content::before,
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content::after {
+  content: '';
+  display: block;
+  width: 25px;
+  height: 24px;
+  background-color: var(--carousel-quote-color);
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 25 24'><path d='M8.5 4 11.3 6.5C8 8.5 5.6 10.6 4.6 13.1A4.7 4.7 0 1 1 1.05 17.6C1.05 11.5 3.8 6.9 8.5 4ZM21.3 4 24.1 6.5C20.8 8.5 18.4 10.6 17.4 13.1A4.7 4.7 0 1 1 13.85 17.6C13.85 11.5 16.6 6.9 21.3 4Z'/></svg>") center / 100% 100% no-repeat;
+}
+
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content::before {
+  margin: 15px 0 19px;
+}
+
+.carousel .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content::after {
+  margin-top: 16px;
+  transform: rotate(180deg);
+}
+
+/* ---------- icon (step) slides ---------- */
+.carousel .carousel-slide:has(.carousel-slide-image img) {
+  min-height: 343px;
+  text-align: center;
+}
+
+.carousel .carousel-slide-image picture,
+.carousel .carousel-slide-image img {
+  display: block;
+  margin: 0 auto;
+}
+
+.carousel .carousel-slide-image img {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+.carousel .carousel-slide:has(.carousel-slide-image img) .carousel-slide-content {
+  padding: 24px 0 40px;
+}
+
+.carousel .carousel-slide:has(.carousel-slide-image img) .carousel-slide-content :is(h2, h3, h4) {
+  margin: 0 0 5px;
+  font-size: var(--heading-font-size-s);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--brand-orange);
+  text-align: center;
+}
+
+/* ---------- `left` variant (text slides, left-aligned) ----------
+   Source: vet-practice testimonials. The slider sits flush in the section
+   column (12px column padding + 5px empty title margin above, 12px column
+   padding below), and each slide reads top-down on the left:
+   header name -> opening mark -> quote copy -> closing mark.
+   The optional header name is authored as a first paragraph holding only
+   <strong>; flex `order` lifts it above the ::before opening mark. */
+.carousel.left:not(:has(.carousel-slide-image img)) {
+  /* mobile: source slider sits 8px outside the EDS content gutter (16px vs 24px) */
+  margin: 17px -8px 12px;
+}
+
+.carousel.left .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-  min-height: min(50vw, calc(100dvh - var(--header-height)));
+  text-align: left;
 }
 
-.carousel .carousel-slide:has(.carousel-slide-content[data-align='center']) {
-  align-items: center;
+.carousel.left .carousel-slide:not(:has(.carousel-slide-image img)) .carousel-slide-content > p:first-child:not(:only-of-type):has(> strong:only-child) {
+  order: -1;
+  margin: 0;
+  line-height: 20.8px;
 }
 
-.carousel .carousel-slide:has(.carousel-slide-content[data-align='right']) {
-  align-items: flex-end;
-}
-
-.carousel .carousel-slide .carousel-slide-image picture {
+/* ---------- arrows (top-right, plain) ---------- */
+.carousel .carousel-navigation-buttons {
   position: absolute;
-  inset: 0;
-}
-
-.carousel .carousel-slide .carousel-slide-image picture > img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
-
-.carousel .carousel-slide .carousel-slide-content {
+  top: 6px;
+  right: 16px;
   z-index: 1;
-  margin: 68px;
-  padding: 16px;
-  color: white;
-  background-color: rgb(19 19 19 / 75%);
+  display: flex;
+  gap: 64px;
+}
+
+.carousel.hide-arrows .carousel-navigation-buttons {
+  display: none;
+}
+
+.carousel .carousel-navigation-buttons button {
+  display: block;
   position: relative;
-  width: var(--slide-content-width, auto);
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background-color: transparent;
+  color: var(--carousel-arrow-color);
+  cursor: pointer;
+}
+
+.carousel .carousel-navigation-buttons button::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background-color: currentcolor;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='2'><path d='M.8 10.4H19M10.5 1.5Q14 7.5 19.3 10.4 14 13.3 10.5 19.3'/></svg>") center / 20px 20px no-repeat;
+}
+
+.carousel .carousel-navigation-buttons button.slide-prev::before {
+  transform: scaleX(-1);
+}
+
+/* ---------- dots ---------- */
+.carousel nav {
+  padding-bottom: 12px;
 }
 
 .carousel .carousel-slide-indicators {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 12px;
-  padding: 12px;
-  background-color: var(--light-color);
+  gap: 8px;
   line-height: 0;
 }
 
 .carousel .carousel-slide-indicator button {
-  width: 24px;
-  height: 24px;
-  margin: 0;
-  padding: 0;
-  border-radius: 50%;
-  background-color: #dadada;
-  transition: background-color 0.2s;
-}
-
-.carousel .carousel-slide-indicator button:disabled,
-.carousel .carousel-slide-indicator button:hover,
-.carousel .carousel-slide-indicator button:focus-visible {
-  background-color: var(--text-color);
-}
-
-.carousel .carousel-navigation-buttons {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 12px;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 1;
-}
-
-/* stylelint-disable-next-line no-descending-specificity */
-.carousel .carousel-navigation-buttons button {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  border-radius: 50%;
-  padding: 0;
-  background-color: rgb(19 19 19 / 25%);
-  transition: background-color 0.2s;
-}
-
-.carousel .carousel-navigation-buttons button:hover,
-.carousel .carousel-navigation-buttons button:focus-visible {
-  background-color: rgb(19 19 19 / 75%);
-}
-
-.carousel .carousel-navigation-buttons button::after {
   display: block;
-  content: '';
-  border: 2px solid;
-  border-bottom: 0;
-  border-left: 0;
-  height: 12px;
+  box-sizing: border-box;
   width: 12px;
-  position: absolute;
-  top: 50%;
-  left: calc(50% + 2px);
-  transform: translate(-50%, -50%) rotate(-135deg);
+  height: 12px;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background-color: var(--carousel-dot-color);
+  color: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.carousel .carousel-navigation-buttons button.slide-next::after {
-  transform: translate(-50%, -50%) rotate(45deg);
-  left: calc(50% - 2px);
+/* active slide's dot (carousel.js disables it) */
+.carousel .carousel-slide-indicator button:disabled {
+  background-color: var(--carousel-dot-active-color);
+  cursor: default;
 }
 
-@media (width >= 600px) {
+/* keyboard focus ring for arrows and dots */
+.carousel .carousel-navigation-buttons button:focus-visible,
+.carousel .carousel-slide-indicator button:focus-visible {
+  outline: 2px solid var(--carousel-focus-color);
+  outline-offset: 2px;
+}
+
+/* carousel.js only marks a dot once a slide is >=50% in the viewport, so a
+   carousel that is below the fold (or only partly scrolled into view) shows no
+   active dot. The list always starts at slide 1, so highlight the first dot
+   until the script has marked one. */
+.carousel .carousel-slide-indicators:not(:has(button:disabled)) .carousel-slide-indicator:first-child button {
+  background-color: var(--carousel-dot-active-color);
+}
+
+@media (width >= 900px) {
+  .carousel:not(:has(.carousel-slide-image img)) {
+    margin-inline: 24px;
+  }
+
+  .carousel.left:not(:has(.carousel-slide-image img)) {
+    margin-inline: 0;
+  }
+
+  .carousel .carousel-slide:has(.carousel-slide-image img) {
+    min-height: 381px;
+  }
+
+  .carousel .carousel-slide:has(.carousel-slide-image img) .carousel-slide-content :is(h2, h3, h4) {
+    font-size: var(--heading-font-size-l);
+  }
+
   .carousel .carousel-navigation-buttons {
-    left: 24px;
     right: 24px;
-  }
-
-  .carousel .carousel-slide .carousel-slide-content {
-    --slide-content-width: calc((100% - 184px) / 2);
-
-    margin: 92px;
-  }
-
-  .carousel .carousel-slide .carousel-slide-content[data-align='justify'] {
-    --slide-content-width: auto;
+    gap: 16px;
   }
 }

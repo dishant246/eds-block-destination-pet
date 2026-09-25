@@ -10,9 +10,9 @@
  * `.cmp-accordion__item` with a `.cmp-accordion__title` header (title) and a
  * `.cmp-accordion__panel` body (content).
  *
- * Container item cells take NO field-name hints (the accordion-item model's
- * summary/text are filled positionally by the decorator: children[0] = label,
- * children[1] = body).
+ * xwalk item model `accordion-item`: summary (text) → title cell, text
+ * (richtext) → content cell. Each non-empty cell carries its field hint so the
+ * Universal Editor maps it to the right property (only Columns blocks are exempt).
  */
 export default function parse(element, { document }) {
   const items = Array.from(element.querySelectorAll('.cmp-accordion__item'));
@@ -43,7 +43,13 @@ export default function parse(element, { document }) {
       }
     }
 
-    cells.push([label, bodyParts.length ? bodyParts : '']);
+    const titleCell = label
+      ? [document.createComment(' field:summary '), document.createTextNode(label)]
+      : '';
+    const contentCell = bodyParts.length
+      ? [document.createComment(' field:text '), ...bodyParts]
+      : '';
+    cells.push([titleCell, contentCell]);
   });
 
   if (cells.length === 0) {

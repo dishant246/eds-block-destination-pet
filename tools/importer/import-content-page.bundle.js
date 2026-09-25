@@ -294,13 +294,89 @@ var CustomImportScript = (() => {
           bodyParts.push(p);
         }
       }
-      cells.push([label, bodyParts.length ? bodyParts : ""]);
+      const titleCell = label ? [document2.createComment(" field:summary "), document2.createTextNode(label)] : "";
+      const contentCell = bodyParts.length ? [document2.createComment(" field:text "), ...bodyParts] : "";
+      cells.push([titleCell, contentCell]);
     });
     if (cells.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
     const block = WebImporter.Blocks.createBlock(document2, { name: "accordion", cells });
+    element.replaceWith(block);
+  }
+
+  // tools/importer/parsers/carousel.js
+  function parse9(element, { document: document2 }) {
+    const wrapper = element.querySelector(".carousel__item-wrapper") || element;
+    let settings = {};
+    try {
+      settings = JSON.parse(wrapper.getAttribute("data-slick") || "{}");
+    } catch (e) {
+      settings = {};
+    }
+    const variants = [];
+    if (settings.autoplay === true) variants.push("autoplay");
+    if (wrapper.classList.contains("arrows--hidden")) variants.push("hide-arrows");
+    const quoteParas = Array.from(element.querySelectorAll(".testimonial__description p"));
+    if (quoteParas.length && !quoteParas.some((p) => /text-align:\s*center/i.test(p.getAttribute("style") || ""))) {
+      variants.push("left");
+    }
+    const items = Array.from(element.querySelectorAll(".carousel__item")).filter((item) => !item.closest(".slick-cloned"));
+    const cells = [];
+    items.forEach((item) => {
+      const content = [];
+      let image = null;
+      const testimonial = item.querySelector(".testimonial");
+      if (testimonial) {
+        testimonial.querySelectorAll(".testimonial__header-name, .testimonial__header-address").forEach((p) => {
+          if (!p.textContent.trim()) return;
+          const para = document2.createElement("p");
+          if (p.classList.contains("testimonial__header-name")) {
+            const strong = document2.createElement("strong");
+            strong.textContent = p.textContent.trim();
+            para.append(strong);
+          } else {
+            para.textContent = p.textContent.trim();
+          }
+          content.push(para);
+        });
+        testimonial.querySelectorAll(".testimonial__description p").forEach((p) => {
+          if (p.textContent.trim()) content.push(p.cloneNode(true));
+        });
+      } else {
+        const img = item.querySelector(".info-card__asset img, .cmp-image img, img");
+        if (img) image = img.cloneNode(true);
+        const scope = item.querySelector(".info-card__text") || item;
+        scope.querySelectorAll(".cmp-title__text, .cmp-text p").forEach((node) => {
+          if (!node.textContent.trim()) return;
+          if (node.matches(".cmp-title__text")) {
+            const h = document2.createElement("h3");
+            h.textContent = node.textContent.trim();
+            content.push(h);
+          } else {
+            content.push(node.cloneNode(true));
+          }
+        });
+        scope.querySelectorAll("a[href]").forEach((a) => {
+          if (!a.textContent.trim()) return;
+          const link = document2.createElement("a");
+          link.setAttribute("href", a.getAttribute("href"));
+          link.textContent = a.textContent.trim();
+          content.push(link);
+        });
+      }
+      if (!image && content.length === 0) return;
+      const imageCell = image ? [document2.createComment(" field:media_image "), image] : "";
+      const contentCell = content.length ? [document2.createComment(" field:content_text "), ...content] : "";
+      cells.push([imageCell, contentCell]);
+    });
+    if (cells.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const name = variants.length ? `carousel (${variants.join(", ")})` : "carousel";
+    const block = WebImporter.Blocks.createBlock(document2, { name, cells });
     element.replaceWith(block);
   }
 
@@ -413,6 +489,12 @@ var CustomImportScript = (() => {
   var CENTERED_MARKER_ATTR = "data-excat-centered-section";
   var GREY_BAND_MARKER_ATTR = "data-excat-grey-band";
   var BLUE_BAND_MARKER_ATTR = "data-excat-blue-band";
+  var SUBHEAD_MARKER_ATTR = "data-excat-subhead";
+  function subheadStyle(container) {
+    if (container.querySelector(".richtext.subhead-1")) return "subhead-large";
+    if (container.querySelector(".richtext.subhead-2, .richtext.subhead-3")) return "subhead";
+    return null;
+  }
   function isBreak(el) {
     return !!el && el.tagName === "HR";
   }
@@ -450,11 +532,21 @@ var CustomImportScript = (() => {
       }
       const centeredContainers = /* @__PURE__ */ new Set();
       element.querySelectorAll(".title.text-center .cmp-title__text").forEach((title) => {
-        if (title.closest(".background-color--tertiary")) return;
+        const band = title.closest(".background-color--tertiary");
+        if (band) {
+          if (band.querySelector(".infocards, .testimonial, .accordion, .carousel, .mediainfo")) return;
+          if (!band.querySelector(".richtext, a")) return;
+          const prev = band.previousElementSibling;
+          if (isBreak(prev) && prev.hasAttribute(SECTION_MARKER_ATTR)) return;
+        }
         const container = outermostContainer(title);
         if (!container || centeredContainers.has(container)) return;
         centeredContainers.add(container);
-        openBreak(container).setAttribute(CENTERED_MARKER_ATTR, "true");
+        const open = openBreak(container);
+        open.setAttribute(CENTERED_MARKER_ATTR, "true");
+        if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        const subhead = subheadStyle(container);
+        if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
         closeBreak(container);
       });
       element.querySelectorAll(".columncontainer.background-color--secondary").forEach((band) => {
@@ -524,8 +616,12 @@ var CustomImportScript = (() => {
         const styles = [];
         if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push("centered");
         if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push("blue");
+        if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push("grey");
+        if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
         marker.removeAttribute(CENTERED_MARKER_ATTR);
         marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
+        marker.removeAttribute(GREY_BAND_MARKER_ATTR);
+        marker.removeAttribute(SUBHEAD_MARKER_ATTR);
         const metadataBlock = WebImporter.Blocks.createBlock(document, {
           name: "Section Metadata",
           cells: { style: styles.join(", ") }
@@ -554,6 +650,12 @@ var CustomImportScript = (() => {
       {
         name: "hero-minimal-dark",
         instances: [".hero.teaser"]
+      },
+      {
+        // Before cards/quote: slides are built from infocards/testimonials, which
+        // those parsers would otherwise claim individually.
+        name: "carousel",
+        instances: [".carousel.panelcontainer"]
       },
       {
         name: "columns-comfortable-light",
@@ -637,7 +739,8 @@ var CustomImportScript = (() => {
     quote: parse5,
     embed: parse6,
     video: parse7,
-    accordion: parse8
+    accordion: parse8,
+    carousel: parse9
   };
   var transformers = [
     transform,

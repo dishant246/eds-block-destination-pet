@@ -339,19 +339,19 @@ main .section.blue + .section.blue {
 
 /* A grey section whose default content is CTA links (e.g. the /live-webinar/
    "View past webinars / Start a conversation" band): lay the buttons out
-   side-by-side and centered, matching the source. Scoped with :has() to only
-   wrappers that contain a button — so grey sections with headings (homepage
-   feature grid / testimonials) are unaffected. */
+   side-by-side and centered, matching the source. Scoped to wrappers made up
+   ONLY of buttons — grey sections with headings or copy (homepage feature grid /
+   testimonials, the grey vet-practice intro) keep normal stacked flow. */
 /* stylelint-disable no-descending-specificity -- distinct section variants (.grey
    vs .centered); the ordering rule's false-positive doesn't reflect a real override. */
-main .section.grey > .default-content-wrapper:has(> .button-container) {
+main .section.grey > .default-content-wrapper:has(> .button-container):not(:has(> :not(.button-container))) {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
 }
 
-main .section.grey > .default-content-wrapper:has(> .button-container) .button-container {
+main .section.grey > .default-content-wrapper:has(> .button-container):not(:has(> :not(.button-container))) .button-container {
   margin: 0;
 }
 
@@ -412,6 +412,19 @@ main .section.centered > .default-content-wrapper h3 {
 main .section.centered > .default-content-wrapper p:not(.button-container) {
   font-size: var(--body-font-size-s);
   font-weight: 400;
+}
+
+/* Intro copy text styles, from the source's richtext style classes:
+   `subhead` = subhead-2/-3 (16px semibold), `subhead-large` = subhead-1
+   (20px semibold). Unstyled intros keep the regular 16px/400 above. */
+main .section.subhead > .default-content-wrapper p:not(.button-container) {
+  font-weight: 600;
+}
+
+main .section.subhead-large > .default-content-wrapper p:not(.button-container) {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
 }
 
 /* CTA buttons side-by-side and centered (source: two inline buttons on one row) */

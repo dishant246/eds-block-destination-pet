@@ -186,6 +186,32 @@
     ]
   },
   {
+    "id": "carousel",
+    "fields": [
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "value": "",
+        "label": "Options",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Auto Play",
+            "value": "autoplay"
+          },
+          {
+            "name": "Hide Arrows",
+            "value": "hide-arrows"
+          },
+          {
+            "name": "Left-aligned Text",
+            "value": "left"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "carousel-item",
     "fields": [
       {

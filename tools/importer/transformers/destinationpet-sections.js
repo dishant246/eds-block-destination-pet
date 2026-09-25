@@ -21,6 +21,15 @@ function querySection(root, selectors) {
 const CENTERED_MARKER_ATTR = 'data-excat-centered-section';
 const GREY_BAND_MARKER_ATTR = 'data-excat-grey-band';
 const BLUE_BAND_MARKER_ATTR = 'data-excat-blue-band';
+const SUBHEAD_MARKER_ATTR = 'data-excat-subhead';
+
+// Source text-style scale on intro copy: `subhead-1` = 20px/600,
+// `subhead-2` / `subhead-3` = 16px/600, no class = 16px/400.
+function subheadStyle(container) {
+  if (container.querySelector('.richtext.subhead-1')) return 'subhead-large';
+  if (container.querySelector('.richtext.subhead-2, .richtext.subhead-3')) return 'subhead';
+  return null;
+}
 
 // True when `el` is a section break inserted by this transformer.
 function isBreak(el) {
@@ -88,7 +97,19 @@ export default function transform(hookName, element, payload) {
     // "Testimonials" headings) and must not get a second, conflicting section.
     const centeredContainers = new Set();
     element.querySelectorAll('.title.text-center .cmp-title__text').forEach((title) => {
-      if (title.closest('.background-color--tertiary')) return;
+      // Grey (tertiary) bands are normally grey sections handled below (card
+      // grids, testimonials, accordions, title-only bands). The exception is a
+      // grey default-content intro — title + copy/CTA only (e.g. the
+      // sell-your-veterinary-practice "Plan a rewarding future…" band): it is
+      // both centered and grey.
+      const band = title.closest('.background-color--tertiary');
+      if (band) {
+        if (band.querySelector('.infocards, .testimonial, .accordion, .carousel, .mediainfo')) return;
+        if (!band.querySelector('.richtext, a')) return; // title-only band
+        const prev = band.previousElementSibling;
+        if (isBreak(prev) && prev.hasAttribute(SECTION_MARKER_ATTR)) return; // template-managed
+      }
+
       // Bound the page-level container once, however many centered titles it holds.
       const container = outermostContainer(title);
       if (!container || centeredContainers.has(container)) return;
@@ -96,7 +117,11 @@ export default function transform(hookName, element, payload) {
 
       // Opening break (carries the marker); closing break so `centered` doesn't
       // bleed into the following section.
-      openBreak(container).setAttribute(CENTERED_MARKER_ATTR, 'true');
+      const open = openBreak(container);
+      open.setAttribute(CENTERED_MARKER_ATTR, 'true');
+      if (band) open.setAttribute(GREY_BAND_MARKER_ATTR, 'true');
+      const subhead = subheadStyle(container);
+      if (subhead) open.setAttribute(SUBHEAD_MARKER_ATTR, subhead);
       closeBreak(container);
     });
 
@@ -234,8 +259,14 @@ export default function transform(hookName, element, payload) {
       const styles = [];
       if (marker.hasAttribute(CENTERED_MARKER_ATTR)) styles.push('centered');
       if (marker.hasAttribute(BLUE_BAND_MARKER_ATTR)) styles.push('blue');
+      // A grey intro band is also centered: fold `grey` into this single
+      // metadata block (EDS only reads a section's first Section Metadata).
+      if (marker.hasAttribute(GREY_BAND_MARKER_ATTR)) styles.push('grey');
+      if (marker.hasAttribute(SUBHEAD_MARKER_ATTR)) styles.push(marker.getAttribute(SUBHEAD_MARKER_ATTR));
       marker.removeAttribute(CENTERED_MARKER_ATTR);
       marker.removeAttribute(BLUE_BAND_MARKER_ATTR);
+      marker.removeAttribute(GREY_BAND_MARKER_ATTR);
+      marker.removeAttribute(SUBHEAD_MARKER_ATTR);
       const metadataBlock = WebImporter.Blocks.createBlock(document, {
         name: 'Section Metadata',
         cells: { style: styles.join(', ') },

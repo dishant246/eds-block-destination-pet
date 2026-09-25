@@ -10,6 +10,7 @@ import quoteParser from './parsers/quote.js';
 import embedParser from './parsers/embed.js';
 import videoParser from './parsers/video.js';
 import accordionParser from './parsers/accordion.js';
+import carouselParser from './parsers/carousel.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/destinationpet-cleanup.js';
@@ -27,6 +28,12 @@ const PAGE_TEMPLATE = {
     {
       name: 'hero-minimal-dark',
       instances: ['.hero.teaser'],
+    },
+    {
+      // Before cards/quote: slides are built from infocards/testimonials, which
+      // those parsers would otherwise claim individually.
+      name: 'carousel',
+      instances: ['.carousel.panelcontainer'],
     },
     {
       name: 'columns-comfortable-light',
@@ -93,6 +100,7 @@ const parsers = {
   embed: embedParser,
   video: videoParser,
   accordion: accordionParser,
+  carousel: carouselParser,
 };
 
 // TRANSFORMER REGISTRY

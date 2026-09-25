@@ -31,6 +31,12 @@
           ]
         },
         {
+          "name": "carousel",
+          "instances": [
+            ".carousel.panelcontainer"
+          ]
+        },
+        {
           "name": "columns-comfortable-light",
           "instances": [
             ".mediainfo"
