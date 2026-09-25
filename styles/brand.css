@@ -6,7 +6,7 @@
   --link-color: rgb(232 119 34);
   --link-hover-color: rgb(0 86 179);
   --section-padding: 40px;
-  --nav-height: 64px;
+  --nav-height: 117px; /* source mobile header: 28px ribbon + 89px bar */
   --brand-orange: rgb(232 119 34);
   --brand-navy: rgb(30 58 95);
   --brand-grey: rgb(242 240 235);

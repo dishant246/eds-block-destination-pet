@@ -56,6 +56,9 @@
     --body-font-size-s: 16px;
     --body-font-size-xs: 14px;
 
+    /* header (source desktop: 58px social ribbon + 88px bar) */
+    --nav-height: 146px;
+
     /* heading sizes (desktop, from source) */
     --heading-font-size-xxl: 48px;
     --heading-font-size-xl: 32px;
