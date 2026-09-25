@@ -174,6 +174,20 @@ export default function transform(hookName, element, payload) {
       closeBreak(container);
     });
 
+    // A container holding nothing but centered buttons (source `.button__center`,
+    // e.g. the foundation page's closing "Donate Today"): its own centered section.
+    element.querySelectorAll('.columncontainer').forEach((container) => {
+      if (outermostContainer(container) || centeredContainers.has(container)) return;
+      // coloured bands (grey CTA band etc.) are handled by their own rules
+      if (container.matches('[class*="background-color--"]')) return;
+      const buttons = [...container.querySelectorAll('.button')];
+      if (!buttons.length || !buttons.every((b) => b.matches('.button__center'))) return;
+      if (container.querySelector('.title, .richtext, img, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo')) return;
+      centeredContainers.add(container);
+      openBreak(container).setAttribute(CENTERED_MARKER_ATTR, 'true');
+      closeBreak(container);
+    });
+
     // Long-form copy (see isLongFormCopy): its
     // own section, tagged `spaced`.
     element.querySelectorAll('.columncontainer').forEach((container) => {

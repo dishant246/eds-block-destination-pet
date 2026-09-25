@@ -51,7 +51,24 @@ export default function parse(element, { document }) {
     return;
   }
 
-  const imageCell = image ? [image] : [''];
+  // An image carousel on the image side (foundation "Our Impact in Action"):
+  // every real slide image goes into the image cell (slick clones skipped,
+  // duplicates by src dropped); the columns block renders a multi-image cell
+  // as a slideshow.
+  let images = image ? [image] : [];
+  const carousel = imageColumn && imageColumn.querySelector('.carousel');
+  if (carousel) {
+    const seen = new Set();
+    images = [...carousel.querySelectorAll('img')]
+      .filter((img) => !img.closest('.slick-cloned'))
+      .filter((img) => {
+        const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+        if (!src || seen.has(src)) return false;
+        seen.add(src);
+        return true;
+      });
+  }
+  const imageCell = images.length ? images : [''];
   const textCell = textContent.length ? textContent : [''];
 
   // Preserve source column order. Base order comes from the DOM: if the text

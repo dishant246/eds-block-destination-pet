@@ -88,7 +88,18 @@ var CustomImportScript = (() => {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const imageCell = image ? [image] : [""];
+    let images = image ? [image] : [];
+    const carousel = imageColumn && imageColumn.querySelector(".carousel");
+    if (carousel) {
+      const seen = /* @__PURE__ */ new Set();
+      images = [...carousel.querySelectorAll("img")].filter((img) => !img.closest(".slick-cloned")).filter((img) => {
+        const src = img.getAttribute("src") || img.getAttribute("data-src") || "";
+        if (!src || seen.has(src)) return false;
+        seen.add(src);
+        return true;
+      });
+    }
+    const imageCell = images.length ? images : [""];
     const textCell = textContent.length ? textContent : [""];
     let row;
     if (image && textContent.length && image.compareDocumentPosition(textContent[0]) & Node.DOCUMENT_POSITION_PRECEDING) {
@@ -308,6 +319,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/carousel.js
   function parse9(element, { document: document2 }) {
+    if (element.closest(".mediainfo")) return;
     const wrapper = element.querySelector(".carousel__item-wrapper") || element;
     let settings = {};
     try {
@@ -486,6 +498,11 @@ var CustomImportScript = (() => {
       });
     }
     if (hookName === TransformHook.afterTransform) {
+      element.querySelectorAll("a[href]").forEach((a) => {
+        const href = a.getAttribute("href");
+        const match = href && href.match(/^https?:\/\/(www\.)?destinationpet\.com(\/[^\s]*)?$/i);
+        if (match) a.setAttribute("href", match[2] || "/");
+      });
       WebImporter.DOMUtils.remove(element, [
         ".headerRedesign",
         "header",
@@ -672,6 +689,16 @@ var CustomImportScript = (() => {
         if (primary) open.setAttribute(TEXT_PRIMARY_MARKER_ATTR, "true");
         if (!primary && paras.some((p) => p.tagName !== "P")) open.setAttribute(PLAIN_HEADINGS_MARKER_ATTR, "true");
         if (container.matches(".background-color--tertiary")) open.setAttribute(GREY_BAND_MARKER_ATTR, "true");
+        closeBreak(container);
+      });
+      element.querySelectorAll(".columncontainer").forEach((container) => {
+        if (outermostContainer(container) || centeredContainers.has(container)) return;
+        if (container.matches('[class*="background-color--"]')) return;
+        const buttons = [...container.querySelectorAll(".button")];
+        if (!buttons.length || !buttons.every((b) => b.matches(".button__center"))) return;
+        if (container.querySelector(".title, .richtext, img, iframe, video, .rawhtml, .infocards, .testimonial, .accordion, .carousel, .mediainfo")) return;
+        centeredContainers.add(container);
+        openBreak(container).setAttribute(CENTERED_MARKER_ATTR, "true");
         closeBreak(container);
       });
       element.querySelectorAll(".columncontainer").forEach((container) => {

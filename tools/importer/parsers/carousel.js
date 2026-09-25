@@ -23,6 +23,11 @@
  * nodes are cloned so the quote/cards parsers can't also consume them.
  */
 export default function parse(element, { document }) {
+  // An image carousel inside a media-info row (e.g. the foundation page's
+  // "Our Impact in Action" slideshow) belongs to that row's columns block: the
+  // columns parser puts its slides in the image cell, so leave it untouched.
+  if (element.closest('.mediainfo')) return;
+
   const wrapper = element.querySelector('.carousel__item-wrapper') || element;
 
   let settings = {};

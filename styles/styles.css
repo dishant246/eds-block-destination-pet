@@ -636,6 +636,42 @@ main .section.centered > .default-content-wrapper .button-container {
   margin: 12px 8px 0;
 }
 
+/* Page-title heading in a centered intro (source: the foundation page's
+   "Mission Statement" .title h1 — 32px, desktop 40px, 1.1 line; 12px column
+   padding above; 10px to the copy and from the copy to the CTA). Padding, not
+   margin, so the 12px adds to the section gap instead of collapsing into it. */
+main .section.centered:not(.navy) > .default-content-wrapper > h1 {
+  margin: 0 0 10px;
+  padding-top: 12px;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+main .section.centered:not(.navy) > .default-content-wrapper > h1 + p {
+  margin-top: 0;
+}
+
+main .section.centered:not(.navy) > .default-content-wrapper > h1 ~ .button-container {
+  margin-top: 0;
+}
+
+main .section.centered:not(.navy) > .default-content-wrapper > h1 ~ .button-container a.button:any-link {
+  margin-top: 6px;
+}
+
+@media (width >= 900px) {
+  main .section.centered:not(.navy) > .default-content-wrapper > h1 {
+    font-size: 40px;
+  }
+}
+
+/* A section of nothing but a centered button (source `.button__center`
+   containers, e.g. "Donate Today" / "Yourgi support"): the section gap plus
+   the button's own 12px margin give the source's 52px above it. */
+main .section.centered > .default-content-wrapper:not(:has(> :not(.button-container))) .button-container {
+  margin-top: 0;
+}
+
 /* The "Yourgi support" CTA below the contact-form embed is centered in the source
    (its parent is text-align:center) but the default button-container is left
    (start) aligned. Center it. Scoped to the embed section so no other CTA moves. */

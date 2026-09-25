@@ -132,6 +132,90 @@
   }
 }
 
+/* Slideshow image cell (a column holding several images; source: the
+   foundation page's "Our Impact in Action" carousel): one image at a time,
+   sliding every 3s; 12px white dots 8px apart over the bottom of the image,
+   the active one light blue. */
+.columns .columns-slideshow {
+  position: relative;
+  overflow: hidden;
+}
+
+.columns .columns-slides {
+  display: flex;
+  align-items: flex-start;
+  transition: transform 0.5s ease;
+}
+
+.columns .columns-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.columns .columns-slide picture {
+  display: block;
+}
+
+/* every slide in the same 640x438 frame (source), so the dots stay on the image */
+.columns .columns-slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 640 / 438;
+  object-fit: cover;
+}
+
+.columns .columns-slide-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.columns .columns-slide-dots button {
+  width: 12px;
+  height: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.columns .columns-slide-dots button:hover,
+.columns .columns-slide-dots button:focus {
+  background-color: #fff;
+}
+
+.columns .columns-slide-dots button[aria-current="true"] {
+  background-color: var(--brand-light-blue);
+}
+
+/* inline links in the copy (source: bold, underlined, body colour) */
+.columns.comfortable-light p a:any-link {
+  color: var(--text-color);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+@media (width >= 900px) {
+  /* source: 640px slideshow + 510px text, 130px apart; the media row sits
+     80px under the previous content and 108px above the next (with the
+     section gap: 40px top, 56px bottom here) */
+  .columns.comfortable-light > div > .columns-slideshow {
+    flex: 0 0 640px;
+  }
+
+  .columns.comfortable-light > div:has(> .columns-slideshow) {
+    padding: 40px 0 56px;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Variant: minimal-light — centered logo + paragraph + CTA on white
    (source: "Sell your business" section). Rendered as

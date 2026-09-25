@@ -23,7 +23,8 @@
         "https://destinationpet.com/privacy-policy/",
         "https://destinationpet.com/terms-and-conditions/",
         "https://destinationpet.com/about-us/ccpa-request/",
-        "https://destinationpet.com/about-us/tradeshows-events/"
+        "https://destinationpet.com/about-us/tradeshows-events/",
+        "https://www.destinationpet.com/about-us/destination-pet-foundation/"
       ],
       "coverageGaps": [],
       "description": "General content page: full-width hero banner followed by stacked content sections (image+text, icon feature grid, CTA blocks, testimonials)",

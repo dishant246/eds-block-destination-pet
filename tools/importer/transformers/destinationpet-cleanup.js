@@ -36,6 +36,16 @@ export default function transform(hookName, element, payload) {
   }
 
   if (hookName === TransformHook.afterTransform) {
+    // Same-site links: the live site serves internal links sometimes relative
+    // ("/about-us/about/") and sometimes absolute ("https://www.destinationpet.com/
+    // about-us/about/"), which made re-imports flip between the two. Always
+    // store them site-relative so they point at the migrated pages.
+    element.querySelectorAll('a[href]').forEach((a) => {
+      const href = a.getAttribute('href');
+      const match = href && href.match(/^https?:\/\/(www\.)?destinationpet\.com(\/[^\s]*)?$/i);
+      if (match) a.setAttribute('href', match[2] || '/');
+    });
+
     // Non-authorable site chrome verified in cleaned.html:
     //  - .headerRedesign : top ribbon + main header/nav (line 4)
     //  - header.header__main : sticky nav (line 65)
